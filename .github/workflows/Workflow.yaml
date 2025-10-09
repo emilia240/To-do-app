@@ -1,0 +1,71 @@
+name: Workflow-CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+
+jobs:
+  integration-delivery:
+    runs-on: ubuntu-latest
+    environment: test
+    container:
+      image: node
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build website
+        run: npm run build
+
+      - name: FTP delivery
+        uses: SamKirkland/FTP-Deploy-Action@4.3.3
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: test/todo/
+          server-dir: dist/
+
+      - name: Install TestCafe
+        run: npm install -g testcafe
+
+
+      - name: Update APT
+        run: apt-get update
+
+      - name: Install Chromium
+        run: apt-get install -y chromium
+
+      - name: Run TestCafe tests
+        run: testcafe chromium:headless test/*
+
+      - name: Store artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/
+
+  deployment:
+    needs: integration-delivery
+    runs-on: ubuntu-latest
+    environment: Live
+    steps:
+      - name: Load artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist/
+
+      - name: FTP delivery to Live
+        uses: SamKirkland/FTP-Deploy-Action@4.3.3
+        with:
+          server: ${{ secrets.FTP_SERVER_LIVE }}
+          username: ${{ secrets.FTP_USERNAME_LIVE }}
+          password: ${{ secrets.FTP_PASSWORD_LIVE }}
+          local-dir: live/todo/
+          server-dir: dist/
