@@ -28,8 +28,8 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: test/todo/
-          server-dir: dist/
+          local-dir: dist/
+          server-dir: public_html/todo/test/
 
       - name: Install TestCafe
         run: npm install -g testcafe
@@ -67,5 +67,5 @@ jobs:
           server: ${{ secrets.FTP_SERVER_LIVE }}
           username: ${{ secrets.FTP_USERNAME_LIVE }}
           password: ${{ secrets.FTP_PASSWORD_LIVE }}
-          local-dir: live/todo/
-          server-dir: dist/
+          local-dir: dist/
+          server-dir: public_html/todo/live/
