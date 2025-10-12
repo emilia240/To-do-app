@@ -21,6 +21,7 @@ jobs:
 
       - name: Build website
         run: npm run build
+        working-directory: ./to-do-app
 
       - name: FTP delivery
         uses: SamKirkland/FTP-Deploy-Action@4.3.3
@@ -28,7 +29,7 @@ jobs:
           server: ${{ vars.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: dist/
+          local-dir: to-do-app/dist/
           server-dir: public_html/todo/test/
 
       - name: Install TestCafe
@@ -42,13 +43,14 @@ jobs:
         run: apt-get install -y chromium
 
       - name: Run TestCafe tests
-        run: testcafe chromium:headless test/*
+        run: testcafe chromium:headless to-do-app/src/test-cafe-tests.js
+        working-directory: ./to-do-app
 
       - name: Store artifacts
         uses: actions/upload-artifact@v4
         with:
           name: dist
-          path: dist/
+          path: to-do-app/dist/
 
   deployment:
     needs: integration-delivery
