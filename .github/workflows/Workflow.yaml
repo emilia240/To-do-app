@@ -71,7 +71,7 @@ jobs:
       - name: FTP deploy to Live
         uses: SamKirkland/FTP-Deploy-Action@4.3.3
         with:
-          server: ${{ secrets.FTP_SERVER_LIVE }}
+          server: ${{ vars.FTP_SERVER_LIVE }}
           username: ${{ secrets.FTP_USERNAME_LIVE }}
           password: ${{ secrets.FTP_PASSWORD_LIVE }}
           local-dir: dist/
