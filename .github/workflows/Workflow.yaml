@@ -37,20 +37,11 @@ jobs:
       - name: Install TestCafe
         run: npm install -g testcafe
 
-
       - name: Update APT
         run: apt-get update
 
       - name: Install Chromium
         run: apt-get install -y chromium
-
-      - name: Start dev server
-        run: npm run dev -- --host &
-        working-directory: ./to-do-app
-
-      - name: Wait for server to be ready
-        run: npx wait-on http://localhost:5173
-        working-directory: ./to-do-app
 
       - name: Run TestCafe tests
         run: testcafe chromium:headless src/test-cafe-tests.js

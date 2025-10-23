@@ -1,7 +1,7 @@
 import {Selector} from 'testcafe';
 
 fixture (`To-Do App Tests`)
-    .page(`http://localhost:5173/`);
+    .page(`http://emilia123.dk/todo/test/`);
 
     test('1. Add a new todo item', async t => {
     // Arrange - Set up test data and get page elements
