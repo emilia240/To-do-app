@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.0.1](https://github.com/emilia240/To-do-app/compare/v1.0.0...v1.0.1) (2025-10-23)
+
+
+### Bug Fixes
+
+* Change test location to Simply ([63c01ef](https://github.com/emilia240/To-do-app/commit/63c01efdbfe83a4b08668023968c75c668fb8cef))
+* Change test location to Simply ([8651c15](https://github.com/emilia240/To-do-app/commit/8651c150d6a607590a7cbf4e6be663b93888ae18))
+* Move app to subdomain ([0727037](https://github.com/emilia240/To-do-app/commit/07270376c45272b9a2ee838a76c943566d266fcc))
+
 ## 1.0.0 (2025-10-12)
 
 
