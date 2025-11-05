@@ -126,6 +126,31 @@ const initializeForm = (): void => {
     });
 };
 
+
+// Update Statistics Function
+const updateStats = (): void => {
+    const totalTodos = document.getElementById('total-todos') as HTMLDivElement | null;
+    const completedTodos = document.getElementById('completed-todos') as HTMLDivElement | null;
+    const progressPercent = document.getElementById('progress-percent') as HTMLDivElement | null;
+    const criticalTodos = document.getElementById('critical-todos') as HTMLDivElement | null;
+    
+    // Calculate statistics with type safety
+    const total = todos.length;
+    const completed = todos.filter(todo => todo.completed).length;
+    const critical = todos.filter(todo => todo.priority === 'critical').length;
+    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+    
+    // Update DOM elements with null checks
+    if (totalTodos) totalTodos.textContent = total.toString();
+    if (completedTodos) completedTodos.textContent = completed.toString();
+    if (progressPercent) progressPercent.textContent = `${percentage}%`;
+    if (criticalTodos) criticalTodos.textContent = critical.toString();
+    
+    console.log('Stats updated:', { total, completed, critical, percentage });
+};
+
+
+
 // Initialize Application
 const initApp = (): void => {
     console.log('TypeScript Learning Tracker initialized');
