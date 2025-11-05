@@ -49,6 +49,39 @@ const addTodo = (text: string, category: Category, priority: Priority, dueDate?:
 };
 
 
+// Form validation function
+const validateTodoInput = (text: string): boolean => {
+    const trimmedText = text.trim();
+    
+    if (trimmedText === '') {
+        showError('Please enter a TypeScript concept to learn!');
+        return false;
+    }
+    
+    if (trimmedText.length < 3) {
+        showError('Concept name must be at least 3 characters long!');
+        return false;
+    }
+    
+    hideError();
+    return true;
+};
+
+// Error message helper functions
+const showError = (message: string): void => {
+    if (errorMessage) {
+        errorMessage.textContent = message;
+        errorMessage.classList.remove('hidden');
+    }
+};
+
+const hideError = (): void => {
+    if (errorMessage) {
+        errorMessage.classList.add('hidden');
+    }
+};
+
+
 // Initialize Application
 const initApp = (): void => {
     console.log('TypeScript Learning Tracker initialized');
