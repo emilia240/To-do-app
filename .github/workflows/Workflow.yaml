@@ -9,13 +9,16 @@ on:
 
 jobs:
   integration-delivery:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     environment: test
-    container:
-      image: node
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+
+      - name: Setup node
+        uses: actions/setup-node@v6
+        with:
+          node-version: latest
 
       - name: Install dependencies
         run: npm install
@@ -34,18 +37,10 @@ jobs:
           local-dir: to-do-app/dist/
           server-dir: todo/test/
 
-      - name: Install TestCafe
-        run: npm install -g testcafe
-
-      - name: Update APT
-        run: apt-get update
-
-      - name: Install Chromium
-        run: apt-get install -y chromium
-
-      - name: Run TestCafe tests
-        run: testcafe chromium:headless src/test-cafe-tests.js
-        working-directory: ./to-do-app
+      - name: Run TestCafe Tests
+        uses: DevExpress/testcafe-action@latest
+        with:
+          args: "chrome test/*"
 
       - name: Store artifacts
         uses: actions/upload-artifact@v4
