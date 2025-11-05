@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.2.0](https://github.com/emilia240/To-do-app/compare/v1.1.0...v1.2.0) (2025-11-05)
+
+
+### Features
+
+* Add form submission handler with validation and reset app initialization ([e1d4211](https://github.com/emilia240/To-do-app/commit/e1d421192a44b5aac71bdc4d89c4e0186368b5d3))
+* Add form validation with error handling and user feedback ([ed5eb44](https://github.com/emilia240/To-do-app/commit/ed5eb44d4480f768936244983716f97bca80c91e))
+* Add todo creation function ([3cdf6a7](https://github.com/emilia240/To-do-app/commit/3cdf6a7bc813ab605bb40eae911901522ecfd3f1))
+* Implement priority selection logic with TypeScript type safety ([e5ffdc4](https://github.com/emilia240/To-do-app/commit/e5ffdc4d5af1933f4ec15ecc1deb025477b271fe))
+
 ## [1.1.0](https://github.com/emilia240/To-do-app/compare/v1.0.1...v1.1.0) (2025-11-05)
 
 
