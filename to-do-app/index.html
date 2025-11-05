@@ -59,11 +59,69 @@
         <main class="container !mx-auto !max-w-6xl !p-4">
             <!-- Form Section Placeholder -->
             <div class="grid grid-cols-1 lg:grid-cols-3 !gap-6 !mb-6">
+                <!-- Left Column - Todo Form -->
                 <div class="lg:col-span-2">
-                    <div class="bg-light-card dark:bg-dark-card border-2 border-light-border dark:border-dark-border rounded-lg !p-6">
-                        <h2 class="anta-font text-xl !mb-4">Add New Concept</h2>
-                        <!-- Form will be added in feature/todo-form branch -->
-                        <p class="text-gray-500">Form coming soon...</p>
+                    <div class="bg-light-card dark:bg-dark-card border-2 border-light-border dark:border-[#9985FB] rounded-lg p-6">
+                        <h2 class="anta-font text-light-text dark:text-dark-text text-xl mb-4">Add New Concept</h2>
+                        
+                        <!-- ADD ONLY THIS FORM CONTENT -->
+                        <form class="todo-form space-y-4">
+                            <!-- Concept Input -->
+                            <div class="space-y-2">
+                                <label class="block font-medium text-light-text dark:text-dark-text">TypeScript Concept</label>
+                                <input type="text" id="todo-input" placeholder="e.g., Union Types, Interfaces, Generics..." 
+                                      class="w-full p-3 bg-[#F2EDFF] border-2 border-light-border dark:border-[#9985FB] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            
+                            <!-- Category Select -->
+                            <div class="space-y-2">
+                                <label class="block font-medium text-light-text dark:text-dark-text">Category</label>
+                                <select id="category-select" class="w-fit p-3 text-light-text bg-[#F2EDFF] border-2 border-light-border dark:border-[#9985FB] rounded-lg focus:ring-1 focus:ring-[#9985FB] focus:border-transparent">
+                                    <option value="basic">Basic Types</option>
+                                    <option value="advanced">Advanced Types</option>
+                                    <option value="oop">OOP Concepts</option>
+                                    <option value="dom">DOM Manipulation</option>
+                                    <option value="modules">Modules</option>
+                                </select>
+                            </div>
+                            
+                            <!-- Priority Radio Buttons -->
+                            <div class="space-y-2">
+                                <label class="block font-medium text-light-text dark:text-dark-text">Priority</label>
+                                <div class="flex flex-wrap gap-4">
+                                    <label class="flex items-center space-x-2 text-light-text dark:text-dark-text">
+                                        <input type="radio" name="priority" value="low" class="w-4 h-4">
+                                        <span>Low</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2 text-light-text dark:text-dark-text">
+                                        <input type="radio" name="priority" value="medium" checked class="w-4 h-4">
+                                        <span>Medium</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2 text-light-text dark:text-dark-text">
+                                        <input type="radio" name="priority" value="high" class="w-4 h-4">
+                                        <span>High</span>
+                                    </label>
+                                    <label class="flex items-center space-x-2 text-light-text dark:text-dark-text">
+                                        <input type="radio" name="priority" value="critical" class="w-4 h-4">
+                                        <span>Critical</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Due Date -->
+                            <div class="space-y-2">
+                                <label class="block font-medium text-light-text dark:text-dark-text">Due Date (Optional)</label>
+                                <input type="date" id="due-date-input" 
+                                      class="w-fit p-3 text-light-text bg-[#F2EDFF] border-2 border-light-border dark:border-[#9985FB] rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            </div>
+                            
+                            <!-- Add Button -->
+                            <button type="submit" 
+                                    class="w-fit bg-light-border dark:bg-dark-border text-light-bg dark:text-dark-bg anta-font py-3 px-6 rounded-lg border-2 border-light-border dark:border-[#9985FB] hover:bg-transparent hover:text-light-border dark:hover:text-dark-border dark:hover:bg-dark-bg transition-colors">
+                                ➕ Add Learning Concept
+                            </button>
+                        </form>
+                        <!-- END OF ADDED FORM CONTENT -->
                     </div>
                 </div>
                 
