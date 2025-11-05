@@ -51,6 +51,9 @@ const addTodo = (text: string, category: Category, priority: Priority, dueDate?:
     console.log('New todo added:', newTodo);
     console.log('Total todos:', todos.length);
     
+    // Update statistics after adding todo
+    updateStats();
+    
     // TODO: Add saveTodos(), renderTodos(), updateStats() in future branches
 };
 
@@ -132,22 +135,21 @@ const updateStats = (): void => {
     const totalTodos = document.getElementById('total-todos') as HTMLDivElement | null;
     const completedTodos = document.getElementById('completed-todos') as HTMLDivElement | null;
     const progressPercent = document.getElementById('progress-percent') as HTMLDivElement | null;
-    const criticalTodos = document.getElementById('critical-todos') as HTMLDivElement | null;
     
     // Calculate statistics with type safety
     const total = todos.length;
     const completed = todos.filter(todo => todo.completed).length;
-    const critical = todos.filter(todo => todo.priority === 'critical').length;
     const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
     
     // Update DOM elements with null checks
     if (totalTodos) totalTodos.textContent = total.toString();
     if (completedTodos) completedTodos.textContent = completed.toString();
     if (progressPercent) progressPercent.textContent = `${percentage}%`;
-    if (criticalTodos) criticalTodos.textContent = critical.toString();
-    
-    console.log('Stats updated:', { total, completed, critical, percentage });
+
+    console.log('Stats updated:', { total, completed, percentage });
 };
+
+
 
 
 
@@ -157,6 +159,9 @@ const initApp = (): void => {
     
     // Initialize form handling
     initializeForm();
+
+    // Initialize statistics display
+    updateStats();
     
     // Basic dark mode toggle (will be enhanced in feature/dark-mode)
     const darkModeToggle = document.getElementById('toggle-dark-mode');
