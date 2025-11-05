@@ -18,6 +18,14 @@ let editState: EditState = {
     originalText: ''
 };
 
+
+// Get priority from radio buttons with type safety
+const getSelectedPriority = (): Priority => {
+    const selected = document.querySelector('input[name="priority"]:checked') as HTMLInputElement;
+    return selected?.value as Priority || 'medium';
+};
+
+
 // Initialize Application
 const initApp = (): void => {
     console.log('TypeScript Learning Tracker initialized');
