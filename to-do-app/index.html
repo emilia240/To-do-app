@@ -1,26 +1,100 @@
 <!doctype html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + TS</title>
-  </head>
-  <body>
+    <title>TypeScript Learning Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anta&family=Athiti:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        light: {
+                            bg: '#B7BAE4',
+                            card: '#ECE8FF',
+                            border: '#020513',
+                            text: '#020513'
+                        },
+                        dark: {
+                            bg: '#120B2A',
+                            card: '#020513',
+                            border: '#B7BAE4',
+                            text: '#B7BAE4'
+                        }
+                    },
+                    fontFamily: {
+                        anta: ['Anta', 'sans-serif'],
+                        athiti: ['Athiti', 'sans-serif']
+                    }
+                }
+            },
+            darkMode: 'class',
+        }
+    </script>
+</head>
+<body class="bg-light-bg dark:bg-dark-bg text-light-text dark:text-dark-text transition-colors duration-300 min-h-screen">
     <div id="app">
-      <div class="container">
-        <h1>To Do App</h1>
-        <form class="todo-form">
-          <input type="text" id="todo-input" placeholder="enter a todo">
-          <button type="submit">Add todo</button>
-        </form>
-        <!--error handling-->
-        <div id="error-message" class="error-message">Dumbass! enter stuff for your todo list</div>
-        <ul class="todo-list">
-          
-        </ul>
-      </div>
+        <!-- Header -->
+        <header class="border-b-2 border-light-border dark:border-dark-border !p-4">
+            <div class="container !mx-auto !max-w-6xl flex justify-between items-center">
+                <div class="flex items-center !space-x-4">
+                    <div class="!w-10 !h-10 bg-light-border dark:bg-dark-border rounded-lg flex items-center justify-center">
+                        <span class="anta-font text-light-bg dark:text-dark-bg text-lg">TS</span>
+                    </div>
+                    <h1 class="anta-font text-2xl">TypeScript Learning Tracker</h1>
+                </div>
+                <button id="toggle-dark-mode" class="!p-2 rounded-lg border-2 border-light-border dark:border-dark-border hover:bg-light-border dark:hover:bg-dark-border hover:text-light-bg dark:hover:text-dark-bg transition-colors">
+                    <span class="light-icon">🌙</span>
+                    <span class="dark-icon hidden">☀️</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container !mx-auto !max-w-6xl !p-4">
+            <!-- Form Section Placeholder -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 !gap-6 !mb-6">
+                <div class="lg:col-span-2">
+                    <div class="bg-light-card dark:bg-dark-card border-2 border-light-border dark:border-dark-border rounded-lg !p-6">
+                        <h2 class="anta-font text-xl !mb-4">Add New Concept</h2>
+                        <!-- Form will be added in feature/todo-form branch -->
+                        <p class="text-gray-500">Form coming soon...</p>
+                    </div>
+                </div>
+                
+                <!-- Stats Section Placeholder -->
+                <div class="!space-y-4">
+                    <div class="bg-light-card dark:bg-dark-card border-2 border-light-border dark:border-dark-border rounded-lg !p-4 text-center">
+                        <div class="anta-font text-3xl !mb-2 text-blue-500" id="total-todos">0</div>
+                        <div>Concepts to Learn</div>
+                    </div>
+                    <!-- More stats cards will be added in feature/stats-cards branch -->
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div id="error-message" class="hidden bg-red-100 border-2 border-red-400 text-red-700 !px-4 !py-3 rounded-lg !mb-6">
+                Please enter a TypeScript concept to learn!
+            </div>
+
+            <!-- Filter & Actions Placeholder -->
+            <div class="!p-4 !mb-4">
+                <p class="text-gray-500">Filter and action buttons coming soon...</p>
+            </div>
+
+            <!-- Todo List Placeholder -->
+            <div class="bg-light-card dark:bg-dark-card border-2 border-light-border dark:border-dark-border rounded-lg !p-4">
+                <ul class="todo-list !space-y-3">
+                    <li class="text-gray-500 text-center !py-8">Todo list coming soon...</li>
+                </ul>
+            </div>
+        </main>
     </div>
     <script type="module" src="/src/main.ts"></script>
-  </body>
+</body>
 </html>
