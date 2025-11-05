@@ -40,7 +40,7 @@ jobs:
       - name: Run TestCafe Tests
         uses: DevExpress/testcafe-action@latest
         with:
-          args: "chrome test/*"
+          args: "chrome to-do-app/src/test-cafe-tests.js"
 
       - name: Store artifacts
         uses: actions/upload-artifact@v4
