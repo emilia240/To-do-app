@@ -1,5 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 
+// Constants extracted to top of file for reusability
+const validPriorities = ['low', 'medium', 'high', 'critical'];
+const validCategories = ['basic', 'advanced', 'oop', 'dom', 'modules'];
+
 describe('TypeScript Learning Tracker - Todo Form', () => {
     beforeEach(() => {
         // Reset DOM for each test
@@ -22,23 +26,22 @@ describe('TypeScript Learning Tracker - Todo Form', () => {
         })
         
         it('should validate priority values are from allowed union type', () => {
-            const validPriorities = ['low', 'medium', 'high', 'critical'];
             const testPriority = 'high';
-            
+
             expect(validPriorities).toContain(testPriority);
         })
         
         it('should validate category values are from allowed union type', () => {
-            const validCategories = ['basic', 'advanced', 'oop', 'dom', 'modules'];
             const testCategory = 'advanced';
-            
+
             expect(validCategories).toContain(testCategory);
         })
     })
     
     describe('Todo Creation', () => {
         it('should create todo with correct TypeScript interface properties', () => {
-            const mockTodo = {
+            // Renamed from mockTodo to testTodo for accuracy
+            const testTodo = {
                 id: Date.now(),
                 text: 'Learn TypeScript Generics',
                 completed: false,
@@ -47,13 +50,13 @@ describe('TypeScript Learning Tracker - Todo Form', () => {
                 createdAt: new Date()
             };
             
-            expect(mockTodo).toHaveProperty('id');
-            expect(mockTodo).toHaveProperty('text', 'Learn TypeScript Generics');
-            expect(mockTodo).toHaveProperty('completed', false);
-            expect(mockTodo).toHaveProperty('category', 'advanced');
-            expect(mockTodo).toHaveProperty('priority', 'high');
-            expect(mockTodo).toHaveProperty('createdAt');
-            expect(mockTodo.createdAt).toBeInstanceOf(Date);
+            expect(testTodo).toHaveProperty('id');
+            expect(testTodo).toHaveProperty('text', 'Learn TypeScript Generics');
+            expect(testTodo).toHaveProperty('completed', false);
+            expect(testTodo).toHaveProperty('category', 'advanced');
+            expect(testTodo).toHaveProperty('priority', 'high');
+            expect(testTodo).toHaveProperty('createdAt');
+            expect(testTodo.createdAt).toBeInstanceOf(Date);
         })
         
         it('should handle optional due date property correctly', () => {
@@ -73,10 +76,10 @@ describe('TypeScript Learning Tracker - Todo Form', () => {
     })
 })
 
-    // TODO: Add feature-specific tests in their respective branches:
-    // - feature/stats-cards: Statistics calculation tests  
-    // - feature/filter-actions: Filtering and action tests
-    // - feature/todo-list: Todo rendering and CRUD tests
-    // - feature/local-storage: Storage persistence tests
-    // - feature/dark-mode: Theme toggle tests
-    // - feature/import-export: File operations tests
+// TODO: Add feature-specific tests in their respective branches:
+// - feature/stats-cards: Statistics calculation tests  
+// - feature/filter-actions: Filtering and action tests
+// - feature/todo-list: Todo rendering and CRUD tests
+// - feature/local-storage: Storage persistence tests
+// - feature/dark-mode: Theme toggle tests
+// - feature/import-export: File operations tests
