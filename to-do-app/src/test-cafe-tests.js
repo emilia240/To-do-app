@@ -1,46 +1,37 @@
-import {Selector} from 'testcafe';
+import { Selector } from 'testcafe';
 
-fixture (`To-Do App Tests`)
-    .page(`https://todo.emilia123.dk/test/`);
+fixture `TypeScript Learning Tracker Tests`
+    .page`https://todo.emilia123.dk/test/`;
 
-    test('1. Add a new todo item', async t => {
-    // Arrange - Set up test data and get page elements
-    const todoInput = Selector('#todo-input');
-    const todoList = Selector('.todo-list');
-    const todoText = 'Test todo item from TestCafe';
-
-    // Act - Perform the action of adding a todo
+test('1. Application loads correctly', async t => {
+    // Arrange - Get page elements
+    const header = Selector('header');
+    const title = Selector('h1').withText('TypeScript Learning Tracker');
+    const darkModeToggle = Selector('#toggle-dark-mode');
+    
+    // Assert - Verify page structure
     await t
-        .typeText(todoInput, todoText)
-        .pressKey('enter');
+        .expect(header.exists).ok('Header should be present')
+        .expect(title.exists).ok('App title should be displayed')
+        .expect(darkModeToggle.exists).ok('Dark mode toggle should be present');
+});
 
-    // Assert - Verify the todo was added successfully
-    const addedTodo = todoList.find('li').withText(todoText);
-    await t
-        .expect(addedTodo.exists).ok('Todo item should be added to the list')
-        .expect(addedTodo.find('span').textContent).eql(todoText, 'Todo text should match input');
-    });
+test('2. Dark mode toggle works', async t => {
+    // Arrange
+    const darkModeToggle = Selector('#toggle-dark-mode');
+    const body = Selector('html');
+    
+    // Act - Toggle dark mode
+    await t.click(darkModeToggle);
+    
+    // Assert - Check if dark class is applied
+    await t.expect(body.hasClass('dark')).ok('Dark mode should be activated');
+    
+    // Act - Toggle back to light mode
+    await t.click(darkModeToggle);
+    
+    // Assert - Check if dark class is removed
+    await t.expect(body.hasClass('dark')).notOk('Light mode should be activated');
+});
 
-    test('2. Remove a todo item', async t => {
-    // Arrange - Set up test data by first adding a todo
-    const todoInput = Selector('#todo-input');
-    const todoList = Selector('.todo-list');
-    const todoText = 'Todo to be removed';
-
-    // Add a todo first
-    await t
-        .typeText(todoInput, todoText)
-        .pressKey('enter');
-
-    // Get the added todo and its remove button
-    const addedTodo = todoList.find('li').withText(todoText);
-    const removeButton = addedTodo.find('button').withText('Remove');
-
-    // Act - Remove the todo item
-    await t.click(removeButton);
-
-    // Assert - Verify the todo was removed
-    await t
-        .expect(addedTodo.exists).notOk('Todo item should be removed from the list')
-        .expect(todoList.find('li').withText(todoText).exists).notOk('Todo should no longer exist in the list');
-    });
+// More tests will be added as features are implemented
