@@ -82,11 +82,50 @@ const hideError = (): void => {
 };
 
 
+// Form submission handler with full type safety
+const initializeForm = (): void => {
+    if (!todoForm || !todoInput || !categorySelect || !dueDateInput) {
+        console.error('Required form elements not found');
+        return;
+    }
+
+    todoForm.addEventListener('submit', (event: Event) => {
+        event.preventDefault(); // Prevent page reload
+        
+        // Get form values with type casting
+        const text = todoInput.value.trim();
+        const category = categorySelect.value as Category;
+        const priority = getSelectedPriority();
+        const dueDate = dueDateInput.value ? new Date(dueDateInput.value) : undefined;
+        
+        // Validate input
+        if (!validateTodoInput(text)) {
+            todoInput.focus();
+            return;
+        }
+        
+        // Add the todo
+        addTodo(text, category, priority, dueDate);
+        
+        // Reset form after successful submission
+        todoForm.reset();
+        // Reset priority to default (medium)
+        const mediumRadio = document.querySelector('input[name="priority"][value="medium"]') as HTMLInputElement;
+        if (mediumRadio) mediumRadio.checked = true;
+        
+        // Focus back to input for next entry
+        todoInput.focus();
+        
+        console.log('Form submitted successfully');
+    });
+};
+
 // Initialize Application
 const initApp = (): void => {
     console.log('TypeScript Learning Tracker initialized');
-    console.log('Current todos:', todos);
-    console.log('Current filter:', currentFilter);
+    
+    // Initialize form handling
+    initializeForm();
     
     // Basic dark mode toggle (will be enhanced in feature/dark-mode)
     const darkModeToggle = document.getElementById('toggle-dark-mode');
@@ -102,6 +141,7 @@ const initApp = (): void => {
         });
     }
 };
+
 
 // Start the application
 initApp();
