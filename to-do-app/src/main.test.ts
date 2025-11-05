@@ -73,11 +73,42 @@ describe('TypeScript Learning Tracker - Todo Form', () => {
             expect(todoWithDate.dueDate).toBeInstanceOf(Date);
             expect(todoWithoutDate.dueDate).toBeUndefined();
         })
+    })    
+})
+
+
+describe('Statistics Calculation', () => {
+    it('should calculate progress percentage correctly', () => {
+        const todos = [
+            { id: 1, text: 'Todo 1', completed: true, category: 'basic', priority: 'medium', createdAt: new Date() },
+            { id: 2, text: 'Todo 2', completed: true, category: 'basic', priority: 'medium', createdAt: new Date() },
+            { id: 3, text: 'Todo 3', completed: false, category: 'basic', priority: 'medium', createdAt: new Date() },
+            { id: 4, text: 'Todo 4', completed: false, category: 'basic', priority: 'medium', createdAt: new Date() }
+        ];
+
+        const total = todos.length;
+        const completed = todos.filter(todo => todo.completed).length;
+        const percentage = Math.round((completed / total) * 100);
+
+        expect(percentage).toBe(50);
+        expect(total).toBe(4);
+        expect(completed).toBe(2);
+    })
+
+    it('should handle empty todos array for percentage calculation', () => {
+        const todos: any[] = [];
+        const total = todos.length;
+        const completed = todos.filter(todo => todo.completed).length;
+        const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+        expect(percentage).toBe(0);
+        expect(total).toBe(0);
+        expect(completed).toBe(0);
     })
 })
 
+
 // TODO: Add feature-specific tests in their respective branches:
-// - feature/stats-cards: Statistics calculation tests  
 // - feature/filter-actions: Filtering and action tests
 // - feature/todo-list: Todo rendering and CRUD tests
 // - feature/local-storage: Storage persistence tests
