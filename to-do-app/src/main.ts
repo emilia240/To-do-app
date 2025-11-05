@@ -26,6 +26,29 @@ const getSelectedPriority = (): Priority => {
 };
 
 
+// Add Todo Function
+const addTodo = (text: string, category: Category, priority: Priority, dueDate?: Date): void => {
+    // Create new todo object with all required properties
+    const newTodo: Todo = {
+        id: Date.now(), // Simple ID generation for demo
+        text: text.trim(),
+        completed: false,
+        category,
+        priority,
+        dueDate,
+        createdAt: new Date()
+    };
+    
+    // Add to todos array (immutable approach for better testing)
+    todos = [...todos, newTodo];
+    
+    console.log('New todo added:', newTodo);
+    console.log('Total todos:', todos.length);
+    
+    // TODO: Add saveTodos(), renderTodos(), updateStats() in future branches
+};
+
+
 // Initialize Application
 const initApp = (): void => {
     console.log('TypeScript Learning Tracker initialized');
