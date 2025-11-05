@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0](https://github.com/emilia240/To-do-app/compare/v1.0.1...v1.1.0) (2025-11-05)
+
+
+### Features
+
+* Add basic DOM element type casting, state management setup, and start the dark mode ([8184337](https://github.com/emilia240/To-do-app/commit/818433768d37905f3a32b5e98ccfc90bc9cdde7b))
+* Define TypeScript interfaces and union types for Todo application ([416389e](https://github.com/emilia240/To-do-app/commit/416389efae4a70d34ea0b500476878fedbc68482))
+
 ## [1.0.1](https://github.com/emilia240/To-do-app/compare/v1.0.0...v1.0.1) (2025-10-23)
 
 
