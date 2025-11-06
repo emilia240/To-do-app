@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.6.0](https://github.com/emilia240/To-do-app/compare/v1.5.0...v1.6.0) (2025-11-06)
+
+
+### Features
+
+* Add import and export buttons to action section ([d1f2a6f](https://github.com/emilia240/To-do-app/commit/d1f2a6f966efa23b9d2d4bbfdb3d747cb2d62099))
+* Add localStorage load and save functions with error handling ([9df35a8](https://github.com/emilia240/To-do-app/commit/9df35a816425c4008d0255cf0d52391804aa53f1))
+* Add visual storage status indicators for user feedback ([dd93a9d](https://github.com/emilia240/To-do-app/commit/dd93a9d69ad1bb925ac7a8c4f42cb760a2a3c6d3))
+* Integrate saveTodos() calls in all CRUD operations for data persistence ([78740db](https://github.com/emilia240/To-do-app/commit/78740db5aa76d246cff294e439b4264aa352f35b))
+* Load todos from localStorage on app initialization ([eb0306d](https://github.com/emilia240/To-do-app/commit/eb0306dd4a1ffa64a3e1d8472e97530929c60a6a))
+
 ## [1.5.0](https://github.com/emilia240/To-do-app/compare/v1.4.0...v1.5.0) (2025-11-06)
 
 
