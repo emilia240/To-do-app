@@ -3,7 +3,7 @@ import type {
   Todo, 
   Priority,
   Category, 
-  //FilterType, 
+  FilterType, 
   //EditState 
 } from './types'
 
@@ -26,7 +26,7 @@ const progressPercentElement = document.getElementById('progress-percent') as HT
 
 // State Management with Type Annotations
 let todos: Todo[] = [];
-//let currentFilter: FilterType = 'all';
+let currentFilter: FilterType = 'all';
 //let editState: EditState = {
 //    isEditing: false,
 //    editingId: null,
@@ -173,6 +173,46 @@ const updateStats = (): void => {
 
 
 
+// Filter Todos Function
+const filterTodos = (filter: FilterType): void => {
+    currentFilter = filter;
+    // TODO: Add renderTodos() call in next feature branch
+    
+    // Update active filter button styling
+    updateFilterButtonStyling(filter);
+    
+    console.log('Filter changed to:', filter);
+};
+
+
+// Update Filter Button Styling
+const updateFilterButtonStyling = (activeFilter: FilterType): void => {
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        const btnFilter = btn.getAttribute('data-filter') as FilterType;
+        const isActive = btnFilter === activeFilter;
+        
+        // Remove all existing background classes
+        btn.classList.remove('bg-[#9985FB]', 'bg-[#0055FF]', 'bg-[#0F7D00]', 'bg-[#F296BD]');
+        
+        // Apply active styling based on filter type
+        if (isActive) {
+            switch (btnFilter) {
+                case 'all':
+                    btn.classList.add('bg-[#9985FB]');
+                    break;
+                case 'active':
+                    btn.classList.add('bg-[#0055FF]');
+                    break;
+                case 'completed':
+                    btn.classList.add('bg-[#0F7D00]');
+                    break;
+                case 'critical':
+                    btn.classList.add('bg-[#F296BD]');
+                    break;
+            }
+        }
+    });
+};
 
 
 // Initialize Application
