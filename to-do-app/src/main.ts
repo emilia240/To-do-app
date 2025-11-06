@@ -592,6 +592,89 @@ const exportTodosCSV = (): void => {
 };
 
 
+// Import todos from JSON file
+const importTodos = (): void => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    
+    input.onchange = (event) => {
+        const file = (event.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const content = e.target?.result as string;
+                const importedData = JSON.parse(content);
+                
+                // Validate imported data structure
+                if (!importedData.todos || !Array.isArray(importedData.todos)) {
+                    throw new Error('Invalid file format');
+                }
+                
+                // Process imported todos
+                const importedTodos: Todo[] = importedData.todos.map((todo: any) => ({
+                    id: todo.id || Date.now() + Math.random(), // Ensure unique ID
+                    text: todo.text || 'Imported Todo',
+                    completed: Boolean(todo.completed),
+                    category: todo.category || 'basic',
+                    priority: todo.priority || 'medium',
+                    dueDate: todo.dueDate ? new Date(todo.dueDate) : undefined,
+                    createdAt: todo.createdAt ? new Date(todo.createdAt) : new Date()
+                }));
+                
+                // Ask user how to handle import
+                const choice = confirm(
+                    `Import ${importedTodos.length} todos?\n\n` +
+                    `Click OK to REPLACE current todos (${todos.length} items)\n` +
+                    `Click Cancel to MERGE with current todos`
+                );
+                
+                if (choice) {
+                    // Replace current todos
+                    todos = importedTodos;
+                    showStorageStatus(`🔄 Replaced with ${importedTodos.length} todos!`);
+                } else {
+                    // Merge with current todos
+                    const originalCount = todos.length;
+                    todos = [...todos, ...importedTodos];
+                    showStorageStatus(`🔗 Added ${importedTodos.length} todos! Total: ${todos.length}`);
+                }
+                
+                // Update UI and save
+                saveTodos();
+                updateStats();
+                renderTodos();
+                
+                console.log('Import successful:', importedData);
+                
+            } catch (error) {
+                console.error('Error importing todos:', error);
+                showStorageStatus('❌ Import failed! Invalid file format.', true);
+            }
+        };
+        
+        reader.readAsText(file);
+    };
+    
+    input.click();
+};
+
+// Validate imported todo structure
+const validateTodoStructure = (todo: any): boolean => {
+    return (
+        typeof todo.id === 'number' &&
+        typeof todo.text === 'string' &&
+        typeof todo.completed === 'boolean' &&
+        typeof todo.category === 'string' &&
+        typeof todo.priority === 'string' &&
+        (todo.dueDate === undefined || todo.dueDate === null || typeof todo.dueDate === 'string') &&
+        (typeof todo.createdAt === 'string')
+    );
+};
+
+
 
 // Initialize Dark Mode Toggle - moved to dedicated function for consistency
 const initializeDarkMode = (): void => {
