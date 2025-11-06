@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.4.0](https://github.com/emilia240/To-do-app/compare/v1.3.0...v1.4.0) (2025-11-06)
+
+
+### Features
+
+* Add filter and action buttons HTML structure in the placeholder ([3d5e9dc](https://github.com/emilia240/To-do-app/commit/3d5e9dcad8b5031937401b937b13a49ce4c479da))
+* Add filtered todos logic and filter button event listeners ([9410192](https://github.com/emilia240/To-do-app/commit/94101920efa761980c535651ab88b02bde8e63bd))
+* Add toggle all and clear completed functionality with confirmation ([1c643e5](https://github.com/emilia240/To-do-app/commit/1c643e5af6e57b93b396d0e9b82772f5c6f05459))
+* Implement filter functionality with dynamic button styling ([078fac4](https://github.com/emilia240/To-do-app/commit/078fac4545cd470fc5360e860126cbd0999cdad6))
+* Integrate filter and action buttons with app initialization ([9f25c10](https://github.com/emilia240/To-do-app/commit/9f25c101aed12c927e976bdb3551fff632403219))
+
 ## [1.3.0](https://github.com/emilia240/To-do-app/compare/v1.2.0...v1.3.0) (2025-11-06)
 
 
