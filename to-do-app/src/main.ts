@@ -45,6 +45,13 @@ interface TodoStats {
     percentage: number;
 }
 
+// Interface for imported data structure
+interface ImportData {
+    todos: any[];
+    exportDate?: string;
+    version?: string;
+}
+
 // Pure function for calculating statistics - separated from DOM logic
 const calculateStats = (todoList: Todo[]): TodoStats => {
     const total = todoList.length;
@@ -521,6 +528,250 @@ const showStorageStatus = (message: string, isError: boolean = false): void => {
 };
 
 
+
+// Export todos to JSON file
+const exportTodos = (): void => {
+    try {
+        const exportData: ImportData = {
+            todos: todos,
+            exportDate: new Date().toISOString(),
+            version: '1.0'
+        };
+
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
+        
+        // Create download link
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `typescript-todos-${new Date().toISOString().split('T')[0]}.json`;
+        
+        // Trigger download
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Cleanup
+        URL.revokeObjectURL(url);
+        
+        showStorageStatus(`📤 Exported ${todos.length} todos!`);
+        console.log('Todos exported successfully');
+        
+    } catch (error) {
+        console.error('Error exporting todos:', error);
+        showStorageStatus('❌ Export failed!', true);
+    }
+};
+
+// Generate CSV export
+const exportTodosCSV = (): void => {
+    try {
+        const csvHeader = 'ID,Text,Completed,Category,Priority,Due Date,Created At\n';
+        const csvRows = todos.map(todo => {
+            const dueDate = todo.dueDate ? todo.dueDate.toISOString().split('T')[0] : '';
+            const createdAt = todo.createdAt.toISOString().split('T')[0];
+            
+            return `${todo.id},"${todo.text}",${todo.completed},${todo.category},${todo.priority},"${dueDate}","${createdAt}"`;
+        }).join('\n');
+        
+        const csvContent = csvHeader + csvRows;
+        const csvBlob = new Blob([csvContent], { type: 'text/csv' });
+        
+        const downloadUrl = URL.createObjectURL(csvBlob);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = `typescript-todos-${new Date().toISOString().split('T')[0]}.csv`;
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        URL.revokeObjectURL(downloadUrl);
+        
+        showStorageStatus(`📊 Exported ${todos.length} todos as CSV!`);
+        
+    } catch (error) {
+        console.error('Error exporting CSV:', error);
+        showStorageStatus('❌ CSV export failed!', true);
+    }
+};
+
+
+// Import todos from JSON file
+const importTodos = (): void => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    
+    input.onchange = (event) => {
+        const file = (event.target as HTMLInputElement).files?.[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const content = e.target?.result as string;
+                const rawData = JSON.parse(content);
+
+
+                // Use type guard for robust validation
+                if (!validateImportData(rawData)) {
+                    throw new Error('Invalid file format: Expected todos array with valid structure');
+                }
+                
+                // Now we have type-safe access to ImportData
+                const importData: ImportData = rawData;
+                
+
+
+                // Process imported todos
+                const importedTodos: Todo[] = importData.todos.map((todo: any) => ({
+                    id: todo.id || Date.now() + Math.random(),
+                    text: todo.text || 'Imported Todo',
+                    completed: Boolean(todo.completed),
+                    category: todo.category || 'basic',
+                    priority: todo.priority || 'medium',
+                    dueDate: todo.dueDate ? new Date(todo.dueDate) : undefined,
+                    createdAt: todo.createdAt ? new Date(todo.createdAt) : new Date()
+                }));
+                
+                // Store original count for logging
+                const originalCount = todos.length;
+                
+                // Ask user how to handle import
+                const choice = confirm(
+                    `Import ${importedTodos.length} todos?\n\n` +
+                    `Click OK to REPLACE current todos (${originalCount} items)\n` +
+                    `Click Cancel to MERGE with current todos`
+                );
+                
+                if (choice) {
+                    // Replace current todos
+                    todos = importedTodos;
+                    showStorageStatus(`🔄 Replaced ${originalCount} todos with ${importedTodos.length} todos!`);
+                } else {
+                    // Merge with current todos
+                    todos = [...todos, ...importedTodos];
+                    showStorageStatus(`🔗 Added ${importedTodos.length} todos to existing ${originalCount}! Total: ${todos.length}`);
+                }
+                
+                // Update UI and save
+                saveTodos();
+                updateStats();
+                renderTodos();
+                
+                console.log(`Import successful: Original: ${originalCount}, Imported: ${importedTodos.length}, Total: ${todos.length}`);
+                
+            } catch (error) {
+                console.error('Error importing todos:', error);
+                showStorageStatus('❌ Import failed! Invalid file format.', true);
+            }
+        };
+        
+        reader.readAsText(file);
+    };
+    
+    input.click();
+};
+
+
+
+// Type guard function for validating import data structure
+const validateImportData = (data: any): data is ImportData => {
+    return (
+        data &&
+        typeof data === 'object' &&
+        Array.isArray(data.todos) &&
+        data.todos.every((todo: any) => 
+            todo &&
+            typeof todo === 'object' &&
+            typeof todo.text === 'string' &&
+            typeof todo.completed === 'boolean' &&
+            (todo.category === undefined || typeof todo.category === 'string') &&
+            (todo.priority === undefined || typeof todo.priority === 'string')
+        )
+    );
+};
+
+
+// Show export format selection modal
+const showExportDialog = (): void => {
+    // Create modal overlay
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    
+    modal.innerHTML = `
+        <div class="bg-light-card dark:bg-dark-card border-2 border-light-border dark:border-[#9985FB] rounded-lg p-6 max-w-md mx-4">
+            <h3 class="anta-font text-xl mb-4 text-light-text dark:text-dark-text">Export Format</h3>
+            <p class="text-light-text dark:text-dark-text mb-6">Choose your preferred export format:</p>
+            
+            <div class="space-y-3 mb-6">
+                <button id="export-json" class="w-full p-3 rounded-lg border-2 border-light-border dark:border-[#9985FB] hover:bg-light-border dark:hover:bg-[#9985FB] transition-colors text-left">
+                    <div class="font-bold">📄 JSON Format</div>
+                    <div class="text-sm opacity-75">Complete data with import capability</div>
+                </button>
+                
+                <button id="export-csv" class="w-full p-3 rounded-lg border-2 border-light-border dark:border-[#9985FB] hover:bg-light-border dark:hover:bg-[#9985FB] transition-colors text-left">
+                    <div class="font-bold">📊 CSV Format</div>
+                    <div class="text-sm opacity-75">Spreadsheet compatible format</div>
+                </button>
+            </div>
+            
+            <button id="cancel-export" class="w-full p-2 rounded-lg border border-gray-400 text-gray-600 hover:bg-gray-100 transition-colors">
+                Cancel
+            </button>
+        </div>
+    `;
+    
+    // Add event listeners
+    modal.querySelector('#export-json')?.addEventListener('click', () => {
+        exportTodos();
+        document.body.removeChild(modal);
+    });
+    
+    modal.querySelector('#export-csv')?.addEventListener('click', () => {
+        exportTodosCSV();
+        document.body.removeChild(modal);
+    });
+    
+    modal.querySelector('#cancel-export')?.addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
+    
+    // Close on overlay click
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            document.body.removeChild(modal);
+        }
+    });
+    
+    document.body.appendChild(modal);
+};
+
+
+// Initialize Import/Export Button Event Listeners
+const initializeImportExportButtons = (): void => {
+    const exportBtn = document.getElementById('export-todos');
+    const importBtn = document.getElementById('import-todos');
+    
+    if (exportBtn) {
+        exportBtn.addEventListener('click', () => {
+            if (todos.length === 0) {
+                showStorageStatus('❌ No todos to export!', true);
+                return;
+            }
+            showExportDialog();
+        });
+    }
+    
+    if (importBtn) {
+        importBtn.addEventListener('click', importTodos);
+    }
+};
+
+
+
 // Initialize Dark Mode Toggle - moved to dedicated function for consistency
 const initializeDarkMode = (): void => {
     const darkModeToggle = document.getElementById('toggle-dark-mode');
@@ -550,8 +801,10 @@ const initApp = (): void => {
     initializeForm();
     initializeFilterButtons();
     initializeActionButtons();
+    initializeImportExportButtons();
     initializeDarkMode();
     initializeTodoListEventDelegation();
+    
     
     // Initialize statistics display (only called once)
     updateStats();
