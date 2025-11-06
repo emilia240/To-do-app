@@ -270,27 +270,8 @@ const initializeActionButtons = (): void => {
 };
 
 
-// Initialize Application
-const initApp = (): void => {
-    console.log('TypeScript Learning Tracker initialized');
-    
-    // Initialize form handling
-    initializeForm();
-
-    // Initialize statistics display
-    updateStats();
-
-        // Initialize filter and action buttons
-    initializeFilterButtons();
-    initializeActionButtons();
-
-    // Initialize statistics display
-    updateStats();
-    
-    // Set initial filter
-    filterTodos('all');
-    
-    // Basic dark mode toggle (will be enhanced in feature/dark-mode)
+// Initialize Dark Mode Toggle - moved to dedicated function for consistency
+const initializeDarkMode = (): void => {
     const darkModeToggle = document.getElementById('toggle-dark-mode');
     if (darkModeToggle) {
         darkModeToggle.addEventListener('click', () => {
@@ -303,6 +284,23 @@ const initApp = (): void => {
             }
         });
     }
+};
+
+// Initialize Application
+const initApp = (): void => {
+    console.log('TypeScript Learning Tracker initialized');
+    
+    // Initialize all components
+    initializeForm();
+    initializeFilterButtons();
+    initializeActionButtons();
+    initializeDarkMode();
+    
+    // Initialize statistics display (only called once)
+    updateStats();
+    
+    // Set initial filter
+    filterTodos('all');
 };
 
 
