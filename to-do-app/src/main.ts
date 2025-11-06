@@ -26,7 +26,7 @@ const progressPercentElement = document.getElementById('progress-percent') as HT
 
 // State Management with Type Annotations
 let todos: Todo[] = [];
-let currentFilter: FilterType = 'all';
+//let currentFilter: FilterType = 'all';
 //let editState: EditState = {
 //    isEditing: false,
 //    editingId: null,
@@ -175,7 +175,7 @@ const updateStats = (): void => {
 
 // Filter Todos Function
 const filterTodos = (filter: FilterType): void => {
-    currentFilter = filter;
+   // currentFilter = filter;
     // TODO: Add renderTodos() call in next feature branch
     
     // Update active filter button styling
