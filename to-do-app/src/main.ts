@@ -201,7 +201,8 @@ const updateFilterButtonStyling = (activeFilter: FilterType): void => {
 
 
 // Get Filtered Todos Function
-const getFilteredTodos = (): Todo[] => {
+//will make sense later
+/* const getFilteredTodos = (): Todo[] => {
     switch (currentFilter) {
         case 'active':
             return todos.filter(todo => !todo.completed);
@@ -212,7 +213,7 @@ const getFilteredTodos = (): Todo[] => {
         default:
             return todos;
     }
-};
+}; */
 
 // Initialize Filter Event Listeners
 const initializeFilterButtons = (): void => {
