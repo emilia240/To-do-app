@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.3.0](https://github.com/emilia240/To-do-app/compare/v1.2.0...v1.3.0) (2025-11-06)
+
+
+### Features
+
+* Add stats cards HTML with color-coded metrics in the placeholder ([dcb1ab2](https://github.com/emilia240/To-do-app/commit/dcb1ab2e62cab71e5274e3d453ebc54a2fed9d13))
+* Iintegrate stats updates with todo operations and app initialization ([0b4a948](https://github.com/emilia240/To-do-app/commit/0b4a9483670d9e2e5a3cba90044866ed969d78ff))
+* Implement stats calculation logic with TypeScript type safety ([443b245](https://github.com/emilia240/To-do-app/commit/443b245de43ac6f3a8583ddcb473b2acfe5b9d23))
+
 ## [1.2.0](https://github.com/emilia240/To-do-app/compare/v1.1.0...v1.2.0) (2025-11-05)
 
 
