@@ -293,6 +293,16 @@ const initApp = (): void => {
 
     // Initialize statistics display
     updateStats();
+
+        // Initialize filter and action buttons
+    initializeFilterButtons();
+    initializeActionButtons();
+
+    // Initialize statistics display
+    updateStats();
+    
+    // Set initial filter
+    filterTodos('all');
     
     // Basic dark mode toggle (will be enhanced in feature/dark-mode)
     const darkModeToggle = document.getElementById('toggle-dark-mode');
