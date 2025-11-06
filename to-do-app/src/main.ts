@@ -501,6 +501,11 @@ const initializeDarkMode = (): void => {
 const initApp = (): void => {
     console.log('TypeScript Learning Tracker initialized');
     
+    // Load existing todos from localStorage
+    todos = loadTodos();
+    console.log('Loaded', todos.length, 'todos from localStorage');
+
+
     // Initialize all components
     initializeForm();
     initializeFilterButtons();
