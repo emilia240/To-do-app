@@ -240,6 +240,50 @@ const initializeFilterButtons = (): void => {
 };
 
 
+// Toggle All Todos Function
+const toggleAllTodos = (): void => {
+    const allCompleted = todos.every(todo => todo.completed);
+    todos = todos.map(todo => ({
+        ...todo,
+        completed: !allCompleted
+    }));
+    
+    updateStats();
+    
+    console.log('Toggled all todos. All completed:', !allCompleted);
+    
+    // TODO: Add saveTodos(), renderTodos() in future branches
+};
+
+// Clear Completed Todos Function
+const clearCompletedTodos = (): void => {
+    if (confirm('Remove all mastered concepts?')) {
+        const completedCount = todos.filter(todo => todo.completed).length;
+        todos = todos.filter(todo => !todo.completed);
+        
+        updateStats();
+        
+        console.log(`Cleared ${completedCount} completed todos`);
+        
+        // TODO: Add saveTodos(), renderTodos() in future branches
+    }
+};
+
+// Initialize Action Button Event Listeners
+const initializeActionButtons = (): void => {
+    const checkAllBtn = document.getElementById('check-all');
+    const clearCompletedBtn = document.getElementById('clear-completed');
+    
+    if (checkAllBtn) {
+        checkAllBtn.addEventListener('click', toggleAllTodos);
+    }
+    
+    if (clearCompletedBtn) {
+        clearCompletedBtn.addEventListener('click', clearCompletedTodos);
+    }
+};
+
+
 // Initialize Application
 const initApp = (): void => {
     console.log('TypeScript Learning Tracker initialized');
