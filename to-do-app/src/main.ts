@@ -4,7 +4,7 @@ import type {
   Priority,
   Category, 
   FilterType, 
-  EditState 
+ // EditState 
 } from './types'
 
 // DOM Elements with Type Casting
@@ -27,11 +27,11 @@ const progressPercentElement = document.getElementById('progress-percent') as HT
 // State Management with Type Annotations
 let todos: Todo[] = [];
 let currentFilter: FilterType = 'all';
-let editState: EditState = {
+/* let editState: EditState = {
     isEditing: false,
     editingId: null,
     originalText: ''
-};
+}; */
 
 
 
@@ -461,6 +461,9 @@ const initApp = (): void => {
     
     // Initialize statistics display (only called once)
     updateStats();
+
+    // Initial render of todos
+    renderTodos();
     
     // Set initial filter
     filterTodos('all');
