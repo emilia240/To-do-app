@@ -676,23 +676,6 @@ const validateTodoStructure = (todo: any): boolean => {
 
 
 
-// Initialize Dark Mode Toggle - moved to dedicated function for consistency
-const initializeDarkMode = (): void => {
-    const darkModeToggle = document.getElementById('toggle-dark-mode');
-    if (darkModeToggle) {
-        darkModeToggle.addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            const lightIcon = document.querySelector('.light-icon');
-            const darkIcon = document.querySelector('.dark-icon');
-            if (lightIcon && darkIcon) {
-                lightIcon.classList.toggle('hidden');
-                darkIcon.classList.toggle('hidden');
-            }
-        });
-    }
-};
-
-
 // Show export format selection modal
 const showExportDialog = (): void => {
     // Create modal overlay
@@ -748,6 +731,44 @@ const showExportDialog = (): void => {
 };
 
 
+// Initialize Import/Export Button Event Listeners
+const initializeImportExportButtons = (): void => {
+    const exportBtn = document.getElementById('export-todos');
+    const importBtn = document.getElementById('import-todos');
+    
+    if (exportBtn) {
+        exportBtn.addEventListener('click', () => {
+            if (todos.length === 0) {
+                showStorageStatus('❌ No todos to export!', true);
+                return;
+            }
+            showExportDialog();
+        });
+    }
+    
+    if (importBtn) {
+        importBtn.addEventListener('click', importTodos);
+    }
+};
+
+
+
+// Initialize Dark Mode Toggle - moved to dedicated function for consistency
+const initializeDarkMode = (): void => {
+    const darkModeToggle = document.getElementById('toggle-dark-mode');
+    if (darkModeToggle) {
+        darkModeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            const lightIcon = document.querySelector('.light-icon');
+            const darkIcon = document.querySelector('.dark-icon');
+            if (lightIcon && darkIcon) {
+                lightIcon.classList.toggle('hidden');
+                darkIcon.classList.toggle('hidden');
+            }
+        });
+    }
+};
+
 // Initialize Application
 const initApp = (): void => {
     console.log('TypeScript Learning Tracker initialized');
@@ -761,8 +782,10 @@ const initApp = (): void => {
     initializeForm();
     initializeFilterButtons();
     initializeActionButtons();
+    initializeImportExportButtons();
     initializeDarkMode();
     initializeTodoListEventDelegation();
+    
     
     // Initialize statistics display (only called once)
     updateStats();
