@@ -4,7 +4,7 @@ import type {
   Priority,
   Category, 
   FilterType, 
-  //EditState 
+ // EditState 
 } from './types'
 
 // DOM Elements with Type Casting
@@ -12,7 +12,7 @@ const todoInput = document.getElementById('todo-input') as HTMLInputElement | nu
 const categorySelect = document.getElementById('category-select') as HTMLSelectElement | null;
 const dueDateInput = document.getElementById('due-date-input') as HTMLInputElement | null;
 const todoForm = document.querySelector('.todo-form') as HTMLFormElement | null;
-//const todoList = document.querySelector('.todo-list') as HTMLUListElement | null;
+const todoList = document.querySelector('.todo-list') as HTMLUListElement | null;
 const errorMessage = document.getElementById('error-message') as HTMLDivElement | null;
 
 
@@ -27,11 +27,11 @@ const progressPercentElement = document.getElementById('progress-percent') as HT
 // State Management with Type Annotations
 let todos: Todo[] = [];
 let currentFilter: FilterType = 'all';
-//let editState: EditState = {
-//    isEditing: false,
-//    editingId: null,
-//    originalText: ''
-//};
+/* let editState: EditState = {
+    isEditing: false,
+    editingId: null,
+    originalText: ''
+}; */
 
 
 
@@ -81,8 +81,9 @@ const addTodo = (text: string, category: Category, priority: Priority, dueDate?:
     
     // Update statistics after adding todo
     updateStats();
+    renderTodos();
     
-    // TODO: Add saveTodos(), renderTodos() in future branches
+    // TODO: Add saveTodos() in future branches
 };
 
 
@@ -175,11 +176,13 @@ const updateStats = (): void => {
 
 // Filter Todos Function
 const filterTodos = (filter: FilterType): void => {
-    currentFilter = filter;
-    // TODO: Add renderTodos() call in next feature branch
+   currentFilter = filter;
     
     // Update active filter button styling
     updateFilterButtonStyling(filter);
+    
+    // Render todos with new filter
+    renderTodos();
     
     console.log('Filter changed to:', filter);
 };
@@ -201,8 +204,7 @@ const updateFilterButtonStyling = (activeFilter: FilterType): void => {
 
 
 // Get Filtered Todos Function
-//will make sense later
-/* const getFilteredTodos = (): Todo[] => {
+const getFilteredTodos = (): Todo[] => {
     switch (currentFilter) {
         case 'active':
             return todos.filter(todo => !todo.completed);
@@ -213,7 +215,7 @@ const updateFilterButtonStyling = (activeFilter: FilterType): void => {
         default:
             return todos;
     }
-}; */
+};
 
 // Initialize Filter Event Listeners
 const initializeFilterButtons = (): void => {
@@ -235,10 +237,46 @@ const toggleAllTodos = (): void => {
     }));
     
     updateStats();
+    renderTodos();
     
     console.log('Toggled all todos. All completed:', !allCompleted);
+
+    // TODO: Add saveTodos() in future branches
+};
+
+
+// Remove Todo Function
+const removeTodo = (id: number): void => {
+    if (confirm('Remove this concept from your learning list?')) {
+        todos = todos.filter(todo => todo.id !== id);
+        
+        updateStats();
+        renderTodos();
+        
+        console.log('Removed todo:', id);
+        
+        // TODO: Add saveTodos() in local-storage feature
+    }
+};
+
+
+// Start Editing Todo (basic version)
+const startEditing = (id: number, currentText: string): void => {
+    const newText = prompt('Edit your TypeScript concept:', currentText);
     
-    // TODO: Add saveTodos(), renderTodos() in future branches
+    if (newText && newText.trim() !== '' && newText.trim() !== currentText) {
+        todos = todos.map(todo => 
+            todo.id === id ? { ...todo, text: newText.trim() } : todo
+        );
+        
+        updateStats();
+        renderTodos();
+        
+        console.log('Edited todo:', id, 'New text:', newText);
+        
+        // TODO: Add saveTodos() in local-storage feature
+        // TODO: Enhance with inline editing in future update
+    }
 };
 
 // Clear Completed Todos Function
@@ -248,10 +286,11 @@ const clearCompletedTodos = (): void => {
         todos = todos.filter(todo => !todo.completed);
         
         updateStats();
+        renderTodos();
         
         console.log(`Cleared ${completedCount} completed todos`);
         
-        // TODO: Add saveTodos(), renderTodos() in future branches
+        // TODO: Add saveTodos() in future branches
     }
 };
 
@@ -268,6 +307,154 @@ const initializeActionButtons = (): void => {
         clearCompletedBtn.addEventListener('click', clearCompletedTodos);
     }
 };
+
+
+// Toggle Todo Completion
+const toggleTodo = (id: number): void => {
+    todos = todos.map(todo => 
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+    );
+    
+    updateStats();
+    renderTodos();
+    
+    console.log('Toggled todo:', id);
+    
+    // TODO: Add saveTodos() in local-storage feature
+};
+
+// Render Todos Function
+
+// Refactored: Break down renderTodos() into smaller, focused functions
+
+// Create individual todo item HTML
+const createTodoItemHTML = (todo: Todo): string => {
+    return `
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4 flex-1">
+                <input type="checkbox" ${todo.completed ? 'checked' : ''} 
+                       class="todo-checkbox w-5 h-5 rounded border-2 border-light-border dark:border-[#9985FB]"
+                       data-id="${todo.id}">
+                
+                <div class="flex-1">
+                    <div class="flex items-center space-x-3">
+                        <span class="anta-font text-lg ${todo.completed ? 'line-through opacity-60' : ''} text-light-text dark:text-dark-text">
+                            ${todo.text}
+                        </span>
+                        
+                        <div class="flex space-x-2">
+                            <span class="text-xs px-2 py-1 rounded border border-light-border dark:border-[#9985FB] text-light-text dark:text-dark-text">
+                                ${todo.category}
+                            </span>
+                            <span class="text-xs px-2 py-1 rounded border border-light-border dark:border-[#9985FB] text-light-text dark:text-dark-text">
+                                ${todo.priority}
+                            </span>
+                            ${todo.dueDate ? `
+                                <span class="text-xs px-2 py-1 rounded border border-light-border dark:border-[#9985FB] text-light-text dark:text-dark-text">
+                                    ${new Date(todo.dueDate).toLocaleDateString()}
+                                </span>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex space-x-2">
+                <button class="edit-btn p-2 rounded border border-light-border dark:border-[#9985FB] hover:bg-light-border dark:hover:bg-[#9985FB] transition-colors text-light-text dark:text-dark-text"
+                        data-id="${todo.id}" data-text="${todo.text}">
+                    Edit
+                </button>
+                <button class="remove-btn p-2 rounded border border-light-border dark:border-[#9985FB] hover:bg-light-border dark:hover:bg-[#9985FB] transition-colors text-light-text dark:text-dark-text"
+                        data-id="${todo.id}">
+                    Remove
+                </button>
+            </div>
+        </div>
+    `;
+};
+
+// Create empty state message
+const createEmptyStateMessage = (): HTMLLIElement => {
+    const emptyMessage = document.createElement('li');
+    emptyMessage.className = 'text-center py-8 text-light-text dark:text-dark-text';
+    emptyMessage.textContent = currentFilter === 'completed' 
+        ? 'No concepts mastered yet! Keep learning!' 
+        : 'No concepts to show. Add some TypeScript topics to learn!';
+    return emptyMessage;
+};
+
+// Create individual todo list item element
+const createTodoElement = (todo: Todo): HTMLLIElement => {
+    const li = document.createElement('li');
+    li.className = `todo-item p-4 rounded-lg border-2 border-light-border dark:border-[#9985FB] transition-all duration-200 ${
+        todo.completed ? 'opacity-60' : ''
+    }`;
+    li.innerHTML = createTodoItemHTML(todo);
+    return li;
+};
+
+// Refactored: Simplified renderTodos() function - now focused only on DOM manipulation
+const renderTodos = (): void => {
+    if (!todoList) {
+        console.error('Todo list element not found');
+        return;
+    }
+    
+    const filteredTodos = getFilteredTodos();
+    
+    // Clear existing content
+    todoList.innerHTML = '';
+    
+    // Handle empty state
+    if (filteredTodos.length === 0) {
+        todoList.appendChild(createEmptyStateMessage());
+        return;
+    }
+    
+    // Render each todo using focused helper function
+    filteredTodos.forEach(todo => {
+        todoList.appendChild(createTodoElement(todo));
+    });
+};
+
+// Refactored: Use event delegation instead of multiple event listeners
+const initializeTodoListEventDelegation = (): void => {
+    if (!todoList) {
+        console.error('Todo list element not found for event delegation');
+        return;
+    }
+
+    // Single event listener on parent element using event delegation
+    todoList.addEventListener('click', (event) => {
+        const target = event.target as HTMLElement;
+        
+        // Handle edit button clicks
+        if (target.classList.contains('edit-btn')) {
+            const todoId = parseInt(target.dataset.id || '0');
+            const todoText = target.dataset.text || '';
+            startEditing(todoId, todoText);
+        }
+        
+        // Handle remove button clicks
+        if (target.classList.contains('remove-btn')) {
+            const todoId = parseInt(target.dataset.id || '0');
+            removeTodo(todoId);
+        }
+    });
+
+    // Separate event listener for checkbox changes (using delegation)
+    todoList.addEventListener('change', (event) => {
+        const target = event.target as HTMLInputElement;
+        
+        if (target.classList.contains('todo-checkbox')) {
+            const todoId = parseInt(target.dataset.id || '0');
+            toggleTodo(todoId);
+        }
+    });
+};
+
+// Remove the old addTodoEventListeners function - no longer needed
+// const addTodoEventListeners = (): void => { ... } // DELETED
 
 
 // Initialize Dark Mode Toggle - moved to dedicated function for consistency
@@ -295,9 +482,13 @@ const initApp = (): void => {
     initializeFilterButtons();
     initializeActionButtons();
     initializeDarkMode();
+    initializeTodoListEventDelegation();
     
     // Initialize statistics display (only called once)
     updateStats();
+
+    // Initial render of todos
+    renderTodos();
     
     // Set initial filter
     filterTodos('all');
