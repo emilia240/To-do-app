@@ -692,6 +692,62 @@ const initializeDarkMode = (): void => {
     }
 };
 
+
+// Show export format selection modal
+const showExportDialog = (): void => {
+    // Create modal overlay
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    
+    modal.innerHTML = `
+        <div class="bg-light-card dark:bg-dark-card border-2 border-light-border dark:border-[#9985FB] rounded-lg p-6 max-w-md mx-4">
+            <h3 class="anta-font text-xl mb-4 text-light-text dark:text-dark-text">Export Format</h3>
+            <p class="text-light-text dark:text-dark-text mb-6">Choose your preferred export format:</p>
+            
+            <div class="space-y-3 mb-6">
+                <button id="export-json" class="w-full p-3 rounded-lg border-2 border-light-border dark:border-[#9985FB] hover:bg-light-border dark:hover:bg-[#9985FB] transition-colors text-left">
+                    <div class="font-bold">📄 JSON Format</div>
+                    <div class="text-sm opacity-75">Complete data with import capability</div>
+                </button>
+                
+                <button id="export-csv" class="w-full p-3 rounded-lg border-2 border-light-border dark:border-[#9985FB] hover:bg-light-border dark:hover:bg-[#9985FB] transition-colors text-left">
+                    <div class="font-bold">📊 CSV Format</div>
+                    <div class="text-sm opacity-75">Spreadsheet compatible format</div>
+                </button>
+            </div>
+            
+            <button id="cancel-export" class="w-full p-2 rounded-lg border border-gray-400 text-gray-600 hover:bg-gray-100 transition-colors">
+                Cancel
+            </button>
+        </div>
+    `;
+    
+    // Add event listeners
+    modal.querySelector('#export-json')?.addEventListener('click', () => {
+        exportTodos();
+        document.body.removeChild(modal);
+    });
+    
+    modal.querySelector('#export-csv')?.addEventListener('click', () => {
+        exportTodosCSV();
+        document.body.removeChild(modal);
+    });
+    
+    modal.querySelector('#cancel-export')?.addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
+    
+    // Close on overlay click
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            document.body.removeChild(modal);
+        }
+    });
+    
+    document.body.appendChild(modal);
+};
+
+
 // Initialize Application
 const initApp = (): void => {
     console.log('TypeScript Learning Tracker initialized');
