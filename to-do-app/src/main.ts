@@ -7,6 +7,9 @@ import type {
  // EditState 
 } from './types'
 
+// Constants
+const storageKey = 'typescript-todos';
+
 // DOM Elements with Type Casting
 const todoInput = document.getElementById('todo-input') as HTMLInputElement | null;
 const categorySelect = document.getElementById('category-select') as HTMLSelectElement | null;
@@ -455,7 +458,7 @@ const initializeTodoListEventDelegation = (): void => {
 // Load todos from localStorage
 const loadTodos = (): Todo[] => {
     try {
-        const stored = localStorage.getItem('typescript-todos');
+        const stored = localStorage.getItem(storageKey);
         if (stored) {
             const parsed = JSON.parse(stored);
             const loadedTodos = parsed.map((todo: any) => ({
@@ -476,7 +479,7 @@ const loadTodos = (): Todo[] => {
 // Save todos to localStorage
 const saveTodos = (): void => {
     try {
-        localStorage.setItem('typescript-todos', JSON.stringify(todos));
+        localStorage.setItem(storageKey, JSON.stringify(todos));
         console.log('Todos saved to localStorage');
         showStorageStatus('Todos saved successfully');
     } catch (error) {
