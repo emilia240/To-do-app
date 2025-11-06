@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.7.0](https://github.com/emilia240/To-do-app/compare/v1.6.0...v1.7.0) (2025-11-06)
+
+
+### Features
+
+* Add export format selection dialog with JSON and CSV options ([40c26d9](https://github.com/emilia240/To-do-app/commit/40c26d9a448c8deddd89bef5a8648ee36c0485a6))
+* Implement JSON and CSV export functionality with download links ([8a8a726](https://github.com/emilia240/To-do-app/commit/8a8a7266e02bc7164603c6bf5ef1929bd37e516c))
+* Implement JSON import with validation and merge/replace options ([57ba4c1](https://github.com/emilia240/To-do-app/commit/57ba4c1587fbae22a7fc67e5945c3d63ee94bcc6))
+* Initialize import/export buttons with validation and user feedback ([457c009](https://github.com/emilia240/To-do-app/commit/457c00990e14720f196af60a1e16bdf01e478940))
+
+
+### Bug Fixes
+
+* Address unused variables and function declarations ([1e74436](https://github.com/emilia240/To-do-app/commit/1e7443628fc1f8717e8eb52cf56ce71d49b35400))
+
 ## [1.6.0](https://github.com/emilia240/To-do-app/compare/v1.5.0...v1.6.0) (2025-11-06)
 
 
