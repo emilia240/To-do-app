@@ -453,8 +453,35 @@ const initializeTodoListEventDelegation = (): void => {
     });
 };
 
-// Remove the old addTodoEventListeners function - no longer needed
-// const addTodoEventListeners = (): void => { ... } // DELETED
+
+
+// Load todos from localStorage
+const loadTodos = (): Todo[] => {
+    try {
+        const stored = localStorage.getItem('typescript-todos');
+        if (stored) {
+            const parsed = JSON.parse(stored);
+            return parsed.map((todo: any) => ({
+                ...todo,
+                dueDate: todo.dueDate ? new Date(todo.dueDate) : undefined,
+                createdAt: new Date(todo.createdAt)
+            }));
+        }
+    } catch (error) {
+        console.error('Error loading todos from localStorage:', error);
+    }
+    return [];
+};
+
+// Save todos to localStorage
+const saveTodos = (): void => {
+    try {
+        localStorage.setItem('typescript-todos', JSON.stringify(todos));
+        console.log('Todos saved to localStorage');
+    } catch (error) {
+        console.error('Error saving todos to localStorage:', error);
+    }
+};
 
 
 // Initialize Dark Mode Toggle - moved to dedicated function for consistency
