@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.5.0](https://github.com/emilia240/To-do-app/compare/v1.4.0...v1.5.0) (2025-11-06)
+
+
+### Features
+
+* Add initial todo rendering to app initialization ([0889f97](https://github.com/emilia240/To-do-app/commit/0889f972372a7ae560544ce0bb9c3c74f8e79ad7))
+* Add todo interaction handlers for toggle, edit, and remove operations ([d9f583d](https://github.com/emilia240/To-do-app/commit/d9f583d0533cb0f17f689d45a41d481d9ddc9805))
+* Add todo list DOM element and state management for rendering ([d9951e0](https://github.com/emilia240/To-do-app/commit/d9951e0c7206d3e7073d7c84bfaf93cd67b0d2f5))
+* Add todo list HTML structure in placeholder ([3cbd50e](https://github.com/emilia240/To-do-app/commit/3cbd50ef9436384dca9c8b64bb54e23af4162a11))
+* Implement todo rendering with empty states and dynamic content ([88712d4](https://github.com/emilia240/To-do-app/commit/88712d439cb7705ffaf9c315acf4f8e5c7a3405a))
+* Integrate todo rendering with all CRUD operations and filtering ([d3b8c93](https://github.com/emilia240/To-do-app/commit/d3b8c935b35ac8805bc5d82b956ced910aa978ff))
+
 ## [1.4.0](https://github.com/emilia240/To-do-app/compare/v1.3.0...v1.4.0) (2025-11-06)
 
 
