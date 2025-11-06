@@ -185,31 +185,16 @@ const filterTodos = (filter: FilterType): void => {
 };
 
 
-// Update Filter Button Styling
+// Filter Button Styling
 const updateFilterButtonStyling = (activeFilter: FilterType): void => {
     document.querySelectorAll('.filter-btn').forEach(btn => {
         const btnFilter = btn.getAttribute('data-filter') as FilterType;
-        const isActive = btnFilter === activeFilter;
         
-        // Remove all existing background classes
-        btn.classList.remove('bg-[#9985FB]', 'bg-[#0055FF]', 'bg-[#0F7D00]', 'bg-[#F296BD]');
-        
-        // Apply active styling based on filter type
-        if (isActive) {
-            switch (btnFilter) {
-                case 'all':
-                    btn.classList.add('bg-[#9985FB]');
-                    break;
-                case 'active':
-                    btn.classList.add('bg-[#0055FF]');
-                    break;
-                case 'completed':
-                    btn.classList.add('bg-[#0F7D00]');
-                    break;
-                case 'critical':
-                    btn.classList.add('bg-[#F296BD]');
-                    break;
-            }
+        if (btnFilter === activeFilter) {
+            btn.classList.add('border-light-border', 'bg-light-border', 'text-light-bg');
+        } else {
+            btn.classList.remove('bg-light-border', 'text-light-bg');
+            btn.classList.add('border-light-border');
         }
     });
 };
