@@ -215,9 +215,111 @@ describe('Todo List Rendering and CRUD', () => {
     })
 })
 
-
+describe('Local Storage Persistence', () => {
+    beforeEach(() => {
+        // Clear localStorage before each test
+        localStorage.clear();
+    });
+    
+    it('should save todos to localStorage in JSON format', () => {
+        const testTodos = [
+            { id: 1, text: 'Test Todo', completed: false, category: 'basic', priority: 'medium', createdAt: new Date() }
+        ];
+        
+        localStorage.setItem('typescript-todos', JSON.stringify(testTodos));
+        const stored = localStorage.getItem('typescript-todos');
+        
+        expect(stored).toBeTruthy();
+        expect(JSON.parse(stored!)).toEqual(testTodos);
+    });
+    
+    it('should load todos from localStorage correctly', () => {
+        const testTodos = [
+            { 
+                id: 1, 
+                text: 'Test Todo', 
+                completed: false, 
+                category: 'basic', 
+                priority: 'medium', 
+                createdAt: '2024-01-01T00:00:00.000Z',
+                dueDate: '2024-12-31T00:00:00.000Z'
+            }
+        ];
+        
+        localStorage.setItem('typescript-todos', JSON.stringify(testTodos));
+        const stored = localStorage.getItem('typescript-todos');
+        const parsed = JSON.parse(stored!);
+        
+        // Simulate the date parsing that happens in loadTodos
+        const loadedTodos = parsed.map((todo: any) => ({
+            ...todo,
+            dueDate: todo.dueDate ? new Date(todo.dueDate) : undefined,
+            createdAt: new Date(todo.createdAt)
+        }));
+        
+        expect(loadedTodos[0].createdAt).toBeInstanceOf(Date);
+        expect(loadedTodos[0].dueDate).toBeInstanceOf(Date);
+        expect(loadedTodos[0].text).toBe('Test Todo');
+    });
+    
+    it('should handle empty localStorage gracefully', () => {
+        const stored = localStorage.getItem('typescript-todos');
+        expect(stored).toBeNull();
+        
+        // Simulate loadTodos behavior
+        const todos = stored ? JSON.parse(stored) : [];
+        expect(todos).toEqual([]);
+    });
+    
+    it('should handle corrupted localStorage data', () => {
+        localStorage.setItem('typescript-todos', 'invalid json');
+        
+        let todos: any[] = [];
+        try {
+            const stored = localStorage.getItem('typescript-todos');
+            if (stored) {
+                todos = JSON.parse(stored);
+            }
+        } catch (error) {
+            todos = []; // Fallback to empty array
+        }
+        
+        expect(todos).toEqual([]);
+    });
+    
+    it('should preserve todo properties during save/load cycle', () => {
+        const originalTodo = {
+            id: 123456789,
+            text: 'Learn TypeScript',
+            completed: true,
+            category: 'advanced' as const,
+            priority: 'high' as const,
+            createdAt: new Date('2024-01-01'),
+            dueDate: new Date('2024-12-31')
+        };
+        
+        // Save
+        localStorage.setItem('typescript-todos', JSON.stringify([originalTodo]));
+        
+        // Load
+        const stored = localStorage.getItem('typescript-todos');
+        const parsed = JSON.parse(stored!);
+        const loadedTodo = {
+            ...parsed[0],
+            dueDate: parsed[0].dueDate ? new Date(parsed[0].dueDate) : undefined,
+            createdAt: new Date(parsed[0].createdAt)
+        };
+        
+        expect(loadedTodo.id).toBe(originalTodo.id);
+        expect(loadedTodo.text).toBe(originalTodo.text);
+        expect(loadedTodo.completed).toBe(originalTodo.completed);
+        expect(loadedTodo.category).toBe(originalTodo.category);
+        expect(loadedTodo.priority).toBe(originalTodo.priority);
+        expect(loadedTodo.createdAt.getTime()).toBe(originalTodo.createdAt.getTime());
+        expect(loadedTodo.dueDate?.getTime()).toBe(originalTodo.dueDate.getTime());
+    });
+});
 
 // TODO: Add feature-specific tests in their respective branches:
-// - feature/local-storage: Storage persistence tests
 // - feature/dark-mode: Theme toggle tests
 // - feature/import-export: File operations tests

@@ -7,6 +7,9 @@ import type {
  // EditState 
 } from './types'
 
+// Constants
+const storageKey = 'typescript-todos';
+
 // DOM Elements with Type Casting
 const todoInput = document.getElementById('todo-input') as HTMLInputElement | null;
 const categorySelect = document.getElementById('category-select') as HTMLSelectElement | null;
@@ -82,8 +85,7 @@ const addTodo = (text: string, category: Category, priority: Priority, dueDate?:
     // Update statistics after adding todo
     updateStats();
     renderTodos();
-    
-    // TODO: Add saveTodos() in future branches
+    saveTodos();
 };
 
 
@@ -238,10 +240,10 @@ const toggleAllTodos = (): void => {
     
     updateStats();
     renderTodos();
+    saveTodos();
     
     console.log('Toggled all todos. All completed:', !allCompleted);
 
-    // TODO: Add saveTodos() in future branches
 };
 
 
@@ -252,10 +254,10 @@ const removeTodo = (id: number): void => {
         
         updateStats();
         renderTodos();
+        saveTodos();
         
         console.log('Removed todo:', id);
         
-        // TODO: Add saveTodos() in local-storage feature
     }
 };
 
@@ -271,10 +273,10 @@ const startEditing = (id: number, currentText: string): void => {
         
         updateStats();
         renderTodos();
+        saveTodos();
         
         console.log('Edited todo:', id, 'New text:', newText);
         
-        // TODO: Add saveTodos() in local-storage feature
         // TODO: Enhance with inline editing in future update
     }
 };
@@ -287,10 +289,9 @@ const clearCompletedTodos = (): void => {
         
         updateStats();
         renderTodos();
+        saveTodos();
         
         console.log(`Cleared ${completedCount} completed todos`);
-        
-        // TODO: Add saveTodos() in future branches
     }
 };
 
@@ -317,10 +318,9 @@ const toggleTodo = (id: number): void => {
     
     updateStats();
     renderTodos();
+    saveTodos();
     
     console.log('Toggled todo:', id);
-    
-    // TODO: Add saveTodos() in local-storage feature
 };
 
 // Render Todos Function
@@ -453,8 +453,72 @@ const initializeTodoListEventDelegation = (): void => {
     });
 };
 
-// Remove the old addTodoEventListeners function - no longer needed
-// const addTodoEventListeners = (): void => { ... } // DELETED
+
+
+// Load todos from localStorage
+const loadTodos = (): Todo[] => {
+    try {
+        const stored = localStorage.getItem(storageKey);
+        if (stored) {
+            const parsed = JSON.parse(stored);
+            const loadedTodos = parsed.map((todo: any) => ({
+                ...todo,
+                dueDate: todo.dueDate ? new Date(todo.dueDate) : undefined,
+                createdAt: new Date(todo.createdAt)
+            }));
+            showStorageStatus(`📂 Loaded ${loadedTodos.length} todos`);
+            return loadedTodos;
+        }
+    } catch (error) {
+        console.error('Error loading todos from localStorage:', error);
+        showStorageStatus('❌ Load failed!', true);
+    }
+    return [];
+};
+
+// Save todos to localStorage
+const saveTodos = (): void => {
+    try {
+        localStorage.setItem(storageKey, JSON.stringify(todos));
+        console.log('Todos saved to localStorage');
+        showStorageStatus('Todos saved successfully');
+    } catch (error) {
+        console.error('Error saving todos to localStorage:', error);
+        showStorageStatus('Error saving todos', true);
+    }
+};
+
+// Add storage status indicator
+const showStorageStatus = (message: string, isError: boolean = false): void => {
+    // Create or get existing status element
+    let statusElement = document.getElementById('storage-status');
+    if (!statusElement) {
+        statusElement = document.createElement('div');
+        statusElement.id = 'storage-status';
+        statusElement.className = 'fixed bottom-4 right-4 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 transform translate-y-full opacity-0';
+        document.body.appendChild(statusElement);
+    }
+    
+    // Update content and styling
+    statusElement.textContent = message;
+    statusElement.className = `fixed bottom-4 right-4 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+        isError 
+            ? 'bg-red-500 text-white border-2 border-red-600' 
+            : 'bg-green-500 text-white border-2 border-green-600'
+    }`;
+    
+    // Show the status
+    setTimeout(() => {
+        statusElement!.style.transform = 'translateY(0)';
+        statusElement!.style.opacity = '1';
+    }, 100);
+    
+    // Hide after 2 seconds
+    setTimeout(() => {
+        statusElement!.style.transform = 'translateY(100%)';
+        statusElement!.style.opacity = '0';
+    }, 2000);
+};
 
 
 // Initialize Dark Mode Toggle - moved to dedicated function for consistency
@@ -477,6 +541,11 @@ const initializeDarkMode = (): void => {
 const initApp = (): void => {
     console.log('TypeScript Learning Tracker initialized');
     
+    // Load existing todos from localStorage
+    todos = loadTodos();
+    console.log('Loaded', todos.length, 'todos from localStorage');
+
+
     // Initialize all components
     initializeForm();
     initializeFilterButtons();
