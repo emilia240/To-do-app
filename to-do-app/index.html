@@ -59,12 +59,12 @@
         <main class="container !mx-auto !max-w-6xl !p-4">
             <!-- Form Section Placeholder -->
             <div class="grid grid-cols-1 lg:grid-cols-3 !gap-6 !mb-6">
+
                 <!-- Left Column - Todo Form -->
                 <div class="lg:col-span-2">
                     <div class="bg-light-card dark:bg-dark-card border-2 border-light-border dark:border-[#9985FB] rounded-lg p-6">
                         <h2 class="anta-font text-light-text dark:text-dark-text text-xl mb-4">Add New Concept</h2>
                         
-                        <!-- ADD ONLY THIS FORM CONTENT -->
                         <form class="todo-form space-y-4">
                             <!-- Concept Input -->
                             <div class="space-y-2">
@@ -121,17 +121,28 @@
                                 ➕ Add Learning Concept
                             </button>
                         </form>
-                        <!-- END OF ADDED FORM CONTENT -->
                     </div>
                 </div>
                 
-                <!-- Stats Section Placeholder -->
-                <div class="!space-y-4">
-                    <div class="bg-light-card dark:bg-dark-card border-2 border-light-border dark:border-dark-border rounded-lg !p-4 text-center">
-                        <div class="anta-font text-3xl !mb-2 text-blue-500" id="total-todos">0</div>
-                        <div>Concepts to Learn</div>
+                <!-- Right Column - Stats Cards -->
+                <div class="space-y-4">
+                    <!-- Total Concepts -->
+                    <div class="bg-light-card dark:bg-dark-card border-2 border-light-border dark:border-[#9985FB] rounded-lg p-4 text-center">
+                        <div class="anta-font text-3xl mb-2 text-[#0055FF]" id="total-todos">0</div>
+                        <div class="text-light-text dark:text-dark-text">Concepts to Learn</div>
                     </div>
-                    <!-- More stats cards will be added in feature/stats-cards branch -->
+                    
+                    <!-- Completed Concepts -->
+                    <div class="bg-light-card dark:bg-dark-card border-2 border-light-border dark:border-[#9985FB] rounded-lg p-4 text-center">
+                        <div class="anta-font text-3xl mb-2 text-[#0F7D00]" id="completed-todos">0</div>
+                        <div class="text-light-text dark:text-dark-text">Concepts Mastered</div>
+                    </div>
+                    
+                    <!-- Progress -->
+                    <div class="bg-light-card dark:bg-dark-card border-2 border-light-border dark:border-[#9985FB] rounded-lg p-4 text-center">
+                        <div class="anta-font text-3xl mb-2 text-[#9985FB]" id="progress-percent">0%</div>
+                        <div class="text-light-text dark:text-dark-text">Learning Progress</div>
+                    </div>
                 </div>
             </div>
 

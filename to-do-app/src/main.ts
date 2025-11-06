@@ -15,6 +15,15 @@ const todoForm = document.querySelector('.todo-form') as HTMLFormElement | null;
 //const todoList = document.querySelector('.todo-list') as HTMLUListElement | null;
 const errorMessage = document.getElementById('error-message') as HTMLDivElement | null;
 
+
+// Statistics DOM elements - defined once as top-level constants
+const totalTodosElement = document.getElementById('total-todos') as HTMLDivElement | null;
+const completedTodosElement = document.getElementById('completed-todos') as HTMLDivElement | null;
+const progressPercentElement = document.getElementById('progress-percent') as HTMLDivElement | null;
+
+
+
+
 // State Management with Type Annotations
 let todos: Todo[] = [];
 //let currentFilter: FilterType = 'all';
@@ -23,6 +32,25 @@ let todos: Todo[] = [];
 //    editingId: null,
 //    originalText: ''
 //};
+
+
+
+// Statistics calculation interface for type safety
+interface TodoStats {
+    total: number;
+    completed: number;
+    percentage: number;
+}
+
+// Pure function for calculating statistics - separated from DOM logic
+const calculateStats = (todoList: Todo[]): TodoStats => {
+    const total = todoList.length;
+    const completed = todoList.filter(todo => todo.completed).length;
+    const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
+    
+    return { total, completed, percentage };
+};
+
 
 
 // Get priority from radio buttons with type safety
@@ -51,7 +79,10 @@ const addTodo = (text: string, category: Category, priority: Priority, dueDate?:
     console.log('New todo added:', newTodo);
     console.log('Total todos:', todos.length);
     
-    // TODO: Add saveTodos(), renderTodos(), updateStats() in future branches
+    // Update statistics after adding todo
+    updateStats();
+    
+    // TODO: Add saveTodos(), renderTodos() in future branches
 };
 
 
@@ -126,12 +157,33 @@ const initializeForm = (): void => {
     });
 };
 
+
+// Update Statistics Function
+const updateStats = (): void => {
+    // Calculate statistics using pure function
+    const stats = calculateStats(todos);
+    
+    // Update DOM elements with null checks
+    if (totalTodosElement) totalTodosElement.textContent = stats.total.toString();
+    if (completedTodosElement) completedTodosElement.textContent = stats.completed.toString();
+    if (progressPercentElement) progressPercentElement.textContent = `${stats.percentage}%`;
+
+    console.log('Stats updated:', stats);
+};
+
+
+
+
+
 // Initialize Application
 const initApp = (): void => {
     console.log('TypeScript Learning Tracker initialized');
     
     // Initialize form handling
     initializeForm();
+
+    // Initialize statistics display
+    updateStats();
     
     // Basic dark mode toggle (will be enhanced in feature/dark-mode)
     const darkModeToggle = document.getElementById('toggle-dark-mode');
