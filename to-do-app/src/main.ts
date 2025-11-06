@@ -81,8 +81,9 @@ const addTodo = (text: string, category: Category, priority: Priority, dueDate?:
     
     // Update statistics after adding todo
     updateStats();
+    renderTodos();
     
-    // TODO: Add saveTodos(), renderTodos() in future branches
+    // TODO: Add saveTodos() in future branches
 };
 
 
@@ -175,11 +176,13 @@ const updateStats = (): void => {
 
 // Filter Todos Function
 const filterTodos = (filter: FilterType): void => {
-   // currentFilter = filter;
-    // TODO: Add renderTodos() call in next feature branch
+   currentFilter = filter;
     
     // Update active filter button styling
     updateFilterButtonStyling(filter);
+    
+    // Render todos with new filter
+    renderTodos();
     
     console.log('Filter changed to:', filter);
 };
@@ -201,8 +204,7 @@ const updateFilterButtonStyling = (activeFilter: FilterType): void => {
 
 
 // Get Filtered Todos Function
-//will make sense later
-/* const getFilteredTodos = (): Todo[] => {
+const getFilteredTodos = (): Todo[] => {
     switch (currentFilter) {
         case 'active':
             return todos.filter(todo => !todo.completed);
@@ -213,7 +215,7 @@ const updateFilterButtonStyling = (activeFilter: FilterType): void => {
         default:
             return todos;
     }
-}; */
+};
 
 // Initialize Filter Event Listeners
 const initializeFilterButtons = (): void => {
@@ -235,10 +237,11 @@ const toggleAllTodos = (): void => {
     }));
     
     updateStats();
+    renderTodos();
     
     console.log('Toggled all todos. All completed:', !allCompleted);
-    
-    // TODO: Add saveTodos(), renderTodos() in future branches
+
+    // TODO: Add saveTodos() in future branches
 };
 
 
@@ -283,10 +286,11 @@ const clearCompletedTodos = (): void => {
         todos = todos.filter(todo => !todo.completed);
         
         updateStats();
+        renderTodos();
         
         console.log(`Cleared ${completedCount} completed todos`);
         
-        // TODO: Add saveTodos(), renderTodos() in future branches
+        // TODO: Add saveTodos() in future branches
     }
 };
 
@@ -304,34 +308,6 @@ const initializeActionButtons = (): void => {
     }
 };
 
-
-// Add Event Listeners to Todo Items
-const addTodoEventListeners = (): void => {
-    // Checkbox event listeners
-    document.querySelectorAll('.todo-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('change', (event) => {
-            const todoId = parseInt((event.target as HTMLInputElement).dataset.id || '0');
-            toggleTodo(todoId);
-        });
-    });
-    
-    // Edit button event listeners
-    document.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', (event) => {
-            const todoId = parseInt((event.target as HTMLButtonElement).dataset.id || '0');
-            const todoText = (event.target as HTMLButtonElement).dataset.text || '';
-            startEditing(todoId, todoText);
-        });
-    });
-    
-    // Remove button event listeners
-    document.querySelectorAll('.remove-btn').forEach(btn => {
-        btn.addEventListener('click', (event) => {
-            const todoId = parseInt((event.target as HTMLButtonElement).dataset.id || '0');
-            removeTodo(todoId);
-        });
-    });
-};
 
 // Add Event Listeners to Todo Items
 const addTodoEventListeners = (): void => {
