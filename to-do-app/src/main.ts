@@ -270,6 +270,89 @@ const initializeActionButtons = (): void => {
 };
 
 
+
+// Render Todos Function
+const renderTodos = (): void => {
+    if (!todoList) {
+        console.error('Todo list element not found');
+        return;
+    }
+    
+    const filteredTodos = getFilteredTodos();
+    
+    // Clear existing content
+    todoList.innerHTML = '';
+    
+    // Show empty state message
+    if (filteredTodos.length === 0) {
+        const emptyMessage = document.createElement('li');
+        emptyMessage.className = 'text-center py-8 text-light-text dark:text-dark-text';
+        emptyMessage.textContent = currentFilter === 'completed' 
+            ? 'No concepts mastered yet! Keep learning!' 
+            : 'No concepts to show. Add some TypeScript topics to learn!';
+        todoList.appendChild(emptyMessage);
+        return;
+    }
+    
+    // Render each todo
+    filteredTodos.forEach(todo => {
+        const li = document.createElement('li');
+        li.className = `todo-item p-4 rounded-lg border-2 border-light-border dark:border-[#9985FB] transition-all duration-200 ${
+            todo.completed ? 'opacity-60' : ''
+        }`;
+        
+        li.innerHTML = `
+            <div class="flex items-center justify-between">
+                <div class="flex items-center space-x-4 flex-1">
+                    <input type="checkbox" ${todo.completed ? 'checked' : ''} 
+                           class="todo-checkbox w-5 h-5 rounded border-2 border-light-border dark:border-[#9985FB]"
+                           data-id="${todo.id}">
+                    
+                    <div class="flex-1">
+                        <div class="flex items-center space-x-3">
+                            <span class="anta-font text-lg ${todo.completed ? 'line-through opacity-60' : ''} text-light-text dark:text-dark-text">
+                                ${todo.text}
+                            </span>
+                            
+                            <div class="flex space-x-2">
+                                <span class="text-xs px-2 py-1 rounded border border-light-border dark:border-[#9985FB] text-light-text dark:text-dark-text">
+                                    ${todo.category}
+                                </span>
+                                <span class="text-xs px-2 py-1 rounded border border-light-border dark:border-[#9985FB] text-light-text dark:text-dark-text">
+                                    ${todo.priority}
+                                </span>
+                                ${todo.dueDate ? `
+                                    <span class="text-xs px-2 py-1 rounded border border-light-border dark:border-[#9985FB] text-light-text dark:text-dark-text">
+                                        ${new Date(todo.dueDate).toLocaleDateString()}
+                                    </span>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex space-x-2">
+                    <button class="edit-btn p-2 rounded border border-light-border dark:border-[#9985FB] hover:bg-light-border dark:hover:bg-[#9985FB] transition-colors text-light-text dark:text-dark-text"
+                            data-id="${todo.id}" data-text="${todo.text}">
+                        Edit
+                    </button>
+                    <button class="remove-btn p-2 rounded border border-light-border dark:border-[#9985FB] hover:bg-light-border dark:hover:bg-[#9985FB] transition-colors text-light-text dark:text-dark-text"
+                            data-id="${todo.id}">
+                        Remove
+                    </button>
+                </div>
+            </div>
+        `;
+        
+        todoList.appendChild(li);
+    });
+    
+    // Add event listeners to the newly created elements
+    addTodoEventListeners();
+};
+
+
+
 // Initialize Dark Mode Toggle - moved to dedicated function for consistency
 const initializeDarkMode = (): void => {
     const darkModeToggle = document.getElementById('toggle-dark-mode');
