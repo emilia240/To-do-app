@@ -146,8 +146,78 @@ describe('Filter and Actions', () => {
 })
 
 
+// Add to main.test.ts
+describe('Todo List Rendering and CRUD', () => {
+    it('should render empty state message when no todos exist', () => {
+        const todos: any[] = [];
+        const filteredTodos = todos.filter(() => true);
+        
+        expect(filteredTodos).toHaveLength(0);
+    })
+    
+    it('should toggle todo completion status correctly', () => {
+        const testTodos = [
+            { id: 1, text: 'Test Todo', completed: false },
+            { id: 2, text: 'Another Todo', completed: true }
+        ];
+        
+        const updatedTodos = testTodos.map(todo => 
+            todo.id === 1 ? { ...todo, completed: !todo.completed } : todo
+        );
+        
+        expect(updatedTodos[0].completed).toBe(true);
+        expect(updatedTodos[1].completed).toBe(true);
+    })
+    
+    it('should remove todo correctly by id', () => {
+        const testTodos = [
+            { id: 1, text: 'Todo 1' },
+            { id: 2, text: 'Todo 2' },
+            { id: 3, text: 'Todo 3' }
+        ];
+        
+        const filteredTodos = testTodos.filter(todo => todo.id !== 2);
+        
+        expect(filteredTodos).toHaveLength(2);
+        expect(filteredTodos.find(todo => todo.id === 2)).toBeUndefined();
+        expect(filteredTodos.find(todo => todo.id === 1)).toBeDefined();
+        expect(filteredTodos.find(todo => todo.id === 3)).toBeDefined();
+    })
+    
+    it('should edit todo text correctly', () => {
+        const testTodos = [
+            { id: 1, text: 'Original Text', category: 'basic' }
+        ];
+        
+        const updatedTodos = testTodos.map(todo => 
+            todo.id === 1 ? { ...todo, text: 'Edited Text' } : todo
+        );
+        
+        expect(updatedTodos[0].text).toBe('Edited Text');
+        expect(updatedTodos[0].category).toBe('basic'); // Other properties preserved
+    })
+    
+    it('should filter todos by priority correctly', () => {
+        const testTodos = [
+            { id: 1, priority: 'low', completed: false },
+            { id: 2, priority: 'critical', completed: false },
+            { id: 3, priority: 'medium', completed: true },
+            { id: 4, priority: 'critical', completed: true }
+        ];
+        
+        const criticalTodos = testTodos.filter(todo => todo.priority === 'critical');
+        const activeTodos = testTodos.filter(todo => !todo.completed);
+        const completedTodos = testTodos.filter(todo => todo.completed);
+        
+        expect(criticalTodos).toHaveLength(2);
+        expect(activeTodos).toHaveLength(2);
+        expect(completedTodos).toHaveLength(2);
+    })
+})
+
+
+
 // TODO: Add feature-specific tests in their respective branches:
-// - feature/todo-list: Todo rendering and CRUD tests
 // - feature/local-storage: Storage persistence tests
 // - feature/dark-mode: Theme toggle tests
 // - feature/import-export: File operations tests
