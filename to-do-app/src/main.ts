@@ -82,8 +82,7 @@ const addTodo = (text: string, category: Category, priority: Priority, dueDate?:
     // Update statistics after adding todo
     updateStats();
     renderTodos();
-    
-    // TODO: Add saveTodos() in future branches
+    saveTodos();
 };
 
 
@@ -238,10 +237,10 @@ const toggleAllTodos = (): void => {
     
     updateStats();
     renderTodos();
+    saveTodos();
     
     console.log('Toggled all todos. All completed:', !allCompleted);
 
-    // TODO: Add saveTodos() in future branches
 };
 
 
@@ -252,10 +251,10 @@ const removeTodo = (id: number): void => {
         
         updateStats();
         renderTodos();
+        saveTodos();
         
         console.log('Removed todo:', id);
         
-        // TODO: Add saveTodos() in local-storage feature
     }
 };
 
@@ -271,10 +270,10 @@ const startEditing = (id: number, currentText: string): void => {
         
         updateStats();
         renderTodos();
+        saveTodos();
         
         console.log('Edited todo:', id, 'New text:', newText);
         
-        // TODO: Add saveTodos() in local-storage feature
         // TODO: Enhance with inline editing in future update
     }
 };
@@ -287,10 +286,9 @@ const clearCompletedTodos = (): void => {
         
         updateStats();
         renderTodos();
+        saveTodos();
         
         console.log(`Cleared ${completedCount} completed todos`);
-        
-        // TODO: Add saveTodos() in future branches
     }
 };
 
@@ -317,10 +315,9 @@ const toggleTodo = (id: number): void => {
     
     updateStats();
     renderTodos();
+    saveTodos();
     
     console.log('Toggled todo:', id);
-    
-    // TODO: Add saveTodos() in local-storage feature
 };
 
 // Render Todos Function
