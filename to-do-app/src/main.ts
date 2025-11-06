@@ -521,6 +521,78 @@ const showStorageStatus = (message: string, isError: boolean = false): void => {
 };
 
 
+
+// Export todos to JSON file
+const exportTodos = (): void => {
+    try {
+        const dataToExport = {
+            todos: todos,
+            exportDate: new Date().toISOString(),
+            version: '1.0',
+            totalCount: todos.length
+        };
+        
+        const dataStr = JSON.stringify(dataToExport, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        
+        // Create download link
+        const downloadUrl = URL.createObjectURL(dataBlob);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = `typescript-todos-${new Date().toISOString().split('T')[0]}.json`;
+        
+        // Trigger download
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Cleanup
+        URL.revokeObjectURL(downloadUrl);
+        
+        showStorageStatus(`📤 Exported ${todos.length} todos!`);
+        console.log('Todos exported successfully');
+        
+    } catch (error) {
+        console.error('Error exporting todos:', error);
+        showStorageStatus('❌ Export failed!', true);
+    }
+};
+
+// Generate CSV export
+const exportTodosCSV = (): void => {
+    try {
+        const csvHeader = 'ID,Text,Completed,Category,Priority,Due Date,Created At\n';
+        const csvRows = todos.map(todo => {
+            const dueDate = todo.dueDate ? todo.dueDate.toISOString().split('T')[0] : '';
+            const createdAt = todo.createdAt.toISOString().split('T')[0];
+            
+            return `${todo.id},"${todo.text}",${todo.completed},${todo.category},${todo.priority},"${dueDate}","${createdAt}"`;
+        }).join('\n');
+        
+        const csvContent = csvHeader + csvRows;
+        const csvBlob = new Blob([csvContent], { type: 'text/csv' });
+        
+        const downloadUrl = URL.createObjectURL(csvBlob);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = `typescript-todos-${new Date().toISOString().split('T')[0]}.csv`;
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        URL.revokeObjectURL(downloadUrl);
+        
+        showStorageStatus(`📊 Exported ${todos.length} todos as CSV!`);
+        
+    } catch (error) {
+        console.error('Error exporting CSV:', error);
+        showStorageStatus('❌ CSV export failed!', true);
+    }
+};
+
+
+
 // Initialize Dark Mode Toggle - moved to dedicated function for consistency
 const initializeDarkMode = (): void => {
     const darkModeToggle = document.getElementById('toggle-dark-mode');
