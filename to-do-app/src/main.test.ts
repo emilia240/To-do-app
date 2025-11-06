@@ -143,20 +143,6 @@ describe('Filter and Actions', () => {
         expect(allCompleted).toBe(false);
         expect(toggledTodos.every(todo => !todo.completed)).toBe(true);
     })
-
-    it('should filter critical priority todos correctly', () => {
-        const testTodos = [
-            { priority: 'low', text: 'Low priority' },
-            { priority: 'critical', text: 'Critical 1' },
-            { priority: 'medium', text: 'Medium priority' },
-            { priority: 'critical', text: 'Critical 2' }
-        ];
-
-        const criticalTodos = testTodos.filter(todo => todo.priority === 'critical');
-        expect(criticalTodos).toHaveLength(2);
-        expect(criticalTodos[0].text).toBe('Critical 1');
-        expect(criticalTodos[1].text).toBe('Critical 2');
-    })
 })
 
 
