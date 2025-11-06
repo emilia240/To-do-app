@@ -215,6 +215,31 @@ const updateFilterButtonStyling = (activeFilter: FilterType): void => {
 };
 
 
+// Get Filtered Todos Function
+const getFilteredTodos = (): Todo[] => {
+    switch (currentFilter) {
+        case 'active':
+            return todos.filter(todo => !todo.completed);
+        case 'completed':
+            return todos.filter(todo => todo.completed);
+        case 'critical':
+            return todos.filter(todo => todo.priority === 'critical');
+        default:
+            return todos;
+    }
+};
+
+// Initialize Filter Event Listeners
+const initializeFilterButtons = (): void => {
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', (event) => {
+            const filter = (event.target as HTMLButtonElement).dataset.filter as FilterType;
+            filterTodos(filter);
+        });
+    });
+};
+
+
 // Initialize Application
 const initApp = (): void => {
     console.log('TypeScript Learning Tracker initialized');
