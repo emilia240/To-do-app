@@ -458,14 +458,17 @@ const loadTodos = (): Todo[] => {
         const stored = localStorage.getItem('typescript-todos');
         if (stored) {
             const parsed = JSON.parse(stored);
-            return parsed.map((todo: any) => ({
+            const loadedTodos = parsed.map((todo: any) => ({
                 ...todo,
                 dueDate: todo.dueDate ? new Date(todo.dueDate) : undefined,
                 createdAt: new Date(todo.createdAt)
             }));
+            showStorageStatus(`📂 Loaded ${loadedTodos.length} todos`);
+            return loadedTodos;
         }
     } catch (error) {
         console.error('Error loading todos from localStorage:', error);
+        showStorageStatus('❌ Load failed!', true);
     }
     return [];
 };
@@ -475,9 +478,43 @@ const saveTodos = (): void => {
     try {
         localStorage.setItem('typescript-todos', JSON.stringify(todos));
         console.log('Todos saved to localStorage');
+        showStorageStatus('Todos saved successfully');
     } catch (error) {
         console.error('Error saving todos to localStorage:', error);
+        showStorageStatus('Error saving todos', true);
     }
+};
+
+// Add storage status indicator
+const showStorageStatus = (message: string, isError: boolean = false): void => {
+    // Create or get existing status element
+    let statusElement = document.getElementById('storage-status');
+    if (!statusElement) {
+        statusElement = document.createElement('div');
+        statusElement.id = 'storage-status';
+        statusElement.className = 'fixed bottom-4 right-4 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 transform translate-y-full opacity-0';
+        document.body.appendChild(statusElement);
+    }
+    
+    // Update content and styling
+    statusElement.textContent = message;
+    statusElement.className = `fixed bottom-4 right-4 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+        isError 
+            ? 'bg-red-500 text-white border-2 border-red-600' 
+            : 'bg-green-500 text-white border-2 border-green-600'
+    }`;
+    
+    // Show the status
+    setTimeout(() => {
+        statusElement!.style.transform = 'translateY(0)';
+        statusElement!.style.opacity = '1';
+    }, 100);
+    
+    // Hide after 2 seconds
+    setTimeout(() => {
+        statusElement!.style.transform = 'translateY(100%)';
+        statusElement!.style.opacity = '0';
+    }, 2000);
 };
 
 
