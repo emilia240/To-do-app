@@ -3,7 +3,7 @@ import type {
   Todo, 
   Priority,
   Category, 
-  //FilterType, 
+  FilterType, 
   //EditState 
 } from './types'
 
@@ -26,7 +26,7 @@ const progressPercentElement = document.getElementById('progress-percent') as HT
 
 // State Management with Type Annotations
 let todos: Todo[] = [];
-//let currentFilter: FilterType = 'all';
+let currentFilter: FilterType = 'all';
 //let editState: EditState = {
 //    isEditing: false,
 //    editingId: null,
@@ -173,19 +173,105 @@ const updateStats = (): void => {
 
 
 
-
-
-// Initialize Application
-const initApp = (): void => {
-    console.log('TypeScript Learning Tracker initialized');
+// Filter Todos Function
+const filterTodos = (filter: FilterType): void => {
+    currentFilter = filter;
+    // TODO: Add renderTodos() call in next feature branch
     
-    // Initialize form handling
-    initializeForm();
+    // Update active filter button styling
+    updateFilterButtonStyling(filter);
+    
+    console.log('Filter changed to:', filter);
+};
 
-    // Initialize statistics display
+
+// Filter Button Styling
+const updateFilterButtonStyling = (activeFilter: FilterType): void => {
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        const btnFilter = btn.getAttribute('data-filter') as FilterType;
+        
+        if (btnFilter === activeFilter) {
+            btn.classList.add('border-light-border', 'bg-light-border', 'text-light-bg');
+        } else {
+            btn.classList.remove('bg-light-border', 'text-light-bg');
+            btn.classList.add('border-light-border');
+        }
+    });
+};
+
+
+// Get Filtered Todos Function
+//will make sense later
+/* const getFilteredTodos = (): Todo[] => {
+    switch (currentFilter) {
+        case 'active':
+            return todos.filter(todo => !todo.completed);
+        case 'completed':
+            return todos.filter(todo => todo.completed);
+        case 'critical':
+            return todos.filter(todo => todo.priority === 'critical');
+        default:
+            return todos;
+    }
+}; */
+
+// Initialize Filter Event Listeners
+const initializeFilterButtons = (): void => {
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', (event) => {
+            const filter = (event.target as HTMLButtonElement).dataset.filter as FilterType;
+            filterTodos(filter);
+        });
+    });
+};
+
+
+// Toggle All Todos Function
+const toggleAllTodos = (): void => {
+    const allCompleted = todos.every(todo => todo.completed);
+    todos = todos.map(todo => ({
+        ...todo,
+        completed: !allCompleted
+    }));
+    
     updateStats();
     
-    // Basic dark mode toggle (will be enhanced in feature/dark-mode)
+    console.log('Toggled all todos. All completed:', !allCompleted);
+    
+    // TODO: Add saveTodos(), renderTodos() in future branches
+};
+
+// Clear Completed Todos Function
+const clearCompletedTodos = (): void => {
+    if (confirm('Remove all mastered concepts?')) {
+        const completedCount = todos.filter(todo => todo.completed).length;
+        todos = todos.filter(todo => !todo.completed);
+        
+        updateStats();
+        
+        console.log(`Cleared ${completedCount} completed todos`);
+        
+        // TODO: Add saveTodos(), renderTodos() in future branches
+    }
+};
+
+// Initialize Action Button Event Listeners
+const initializeActionButtons = (): void => {
+    const checkAllBtn = document.getElementById('check-all');
+    const clearCompletedBtn = document.getElementById('clear-completed');
+    
+    if (checkAllBtn) {
+        checkAllBtn.addEventListener('click', toggleAllTodos);
+    }
+    
+    if (clearCompletedBtn) {
+        clearCompletedBtn.addEventListener('click', clearCompletedTodos);
+    }
+};
+
+
+// Initialize Dark Mode Toggle - moved to dedicated function for consistency
+const initializeDarkMode = (): void => {
     const darkModeToggle = document.getElementById('toggle-dark-mode');
     if (darkModeToggle) {
         darkModeToggle.addEventListener('click', () => {
@@ -198,6 +284,23 @@ const initApp = (): void => {
             }
         });
     }
+};
+
+// Initialize Application
+const initApp = (): void => {
+    console.log('TypeScript Learning Tracker initialized');
+    
+    // Initialize all components
+    initializeForm();
+    initializeFilterButtons();
+    initializeActionButtons();
+    initializeDarkMode();
+    
+    // Initialize statistics display (only called once)
+    updateStats();
+    
+    // Set initial filter
+    filterTodos('all');
 };
 
 

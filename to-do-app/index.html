@@ -151,9 +151,24 @@
                 Please enter a TypeScript concept to learn!
             </div>
 
-            <!-- Filter & Actions Placeholder -->
-            <div class="!p-4 !mb-4">
-                <p class="text-gray-500">Filter and action buttons coming soon...</p>
+            <!-- Filter & Actions Section -->
+            <div class="p-4 mb-4">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+                    <!-- Filter Tabs -->
+                    <div class="flex flex-wrap gap-2">
+                        <button data-filter="all" class="filter-btn px-4 py-2 rounded-lg border-2 transition-colors anta-font">All</button>
+                        <button data-filter="active" class="filter-btn px-4 py-2 rounded-lg border-2 transition-colors anta-font">To Learn</button>
+                        <button data-filter="completed" class="filter-btn px-4 py-2 rounded-lg border-2 transition-colors anta-font">Mastered</button>
+                        <button data-filter="critical" class="filter-btn px-4 py-2 rounded-lg border-2 transition-colors anta-font">Critical</button>
+                    </div>
+                   
+                    
+                    <!-- Action Buttons -->
+                    <div class="flex flex-wrap gap-2">
+                        <button id="check-all" class="px-4 py-2 rounded-lg border-2 border-light-border hover:bg-light-border hover:text-light-bg transition-colors anta-font">✓ Check All</button>
+                        <button id="clear-completed" class="px-4 py-2 rounded-lg border-2 border-light-border hover:bg-light-border hover:text-light-bg transition-colors anta-font">🗑️ Clear Mastered</button>
+                    </div>
+                </div>
             </div>
 
             <!-- Todo List Placeholder -->

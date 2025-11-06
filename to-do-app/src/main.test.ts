@@ -108,8 +108,45 @@ describe('Statistics Calculation', () => {
 })
 
 
+// Add to main.test.ts
+describe('Filter and Actions', () => {
+    it('should filter todos by completion status', () => {
+        const testTodos = [
+            { id: 1, text: 'Todo 1', completed: true, category: 'basic', priority: 'medium' },
+            { id: 2, text: 'Todo 2', completed: false, category: 'basic', priority: 'medium' },
+            { id: 3, text: 'Todo 3', completed: true, category: 'basic', priority: 'critical' },
+            { id: 4, text: 'Todo 4', completed: false, category: 'basic', priority: 'critical' }
+        ];
+
+        const active = testTodos.filter(todo => !todo.completed);
+        const completed = testTodos.filter(todo => todo.completed);
+        const critical = testTodos.filter(todo => todo.priority === 'critical');
+
+        expect(active).toHaveLength(2);
+        expect(completed).toHaveLength(2);
+        expect(critical).toHaveLength(2);
+    })
+
+    it('should toggle all todos correctly', () => {
+        const testTodos = [
+            { id: 1, completed: true },
+            { id: 2, completed: false },
+            { id: 3, completed: true }
+        ];
+
+        const allCompleted = testTodos.every(todo => todo.completed);
+        const toggledTodos = testTodos.map(todo => ({
+            ...todo,
+            completed: !allCompleted
+        }));
+
+        expect(allCompleted).toBe(false);
+        expect(toggledTodos.every(todo => !todo.completed)).toBe(true);
+    })
+})
+
+
 // TODO: Add feature-specific tests in their respective branches:
-// - feature/filter-actions: Filtering and action tests
 // - feature/todo-list: Todo rendering and CRUD tests
 // - feature/local-storage: Storage persistence tests
 // - feature/dark-mode: Theme toggle tests
