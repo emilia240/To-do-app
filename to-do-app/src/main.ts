@@ -241,6 +241,41 @@ const toggleAllTodos = (): void => {
     // TODO: Add saveTodos(), renderTodos() in future branches
 };
 
+
+// Remove Todo Function
+const removeTodo = (id: number): void => {
+    if (confirm('Remove this concept from your learning list?')) {
+        todos = todos.filter(todo => todo.id !== id);
+        
+        updateStats();
+        renderTodos();
+        
+        console.log('Removed todo:', id);
+        
+        // TODO: Add saveTodos() in local-storage feature
+    }
+};
+
+
+// Start Editing Todo (basic version)
+const startEditing = (id: number, currentText: string): void => {
+    const newText = prompt('Edit your TypeScript concept:', currentText);
+    
+    if (newText && newText.trim() !== '' && newText.trim() !== currentText) {
+        todos = todos.map(todo => 
+            todo.id === id ? { ...todo, text: newText.trim() } : todo
+        );
+        
+        updateStats();
+        renderTodos();
+        
+        console.log('Edited todo:', id, 'New text:', newText);
+        
+        // TODO: Add saveTodos() in local-storage feature
+        // TODO: Enhance with inline editing in future update
+    }
+};
+
 // Clear Completed Todos Function
 const clearCompletedTodos = (): void => {
     if (confirm('Remove all mastered concepts?')) {
@@ -270,6 +305,75 @@ const initializeActionButtons = (): void => {
 };
 
 
+// Add Event Listeners to Todo Items
+const addTodoEventListeners = (): void => {
+    // Checkbox event listeners
+    document.querySelectorAll('.todo-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', (event) => {
+            const todoId = parseInt((event.target as HTMLInputElement).dataset.id || '0');
+            toggleTodo(todoId);
+        });
+    });
+    
+    // Edit button event listeners
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', (event) => {
+            const todoId = parseInt((event.target as HTMLButtonElement).dataset.id || '0');
+            const todoText = (event.target as HTMLButtonElement).dataset.text || '';
+            startEditing(todoId, todoText);
+        });
+    });
+    
+    // Remove button event listeners
+    document.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.addEventListener('click', (event) => {
+            const todoId = parseInt((event.target as HTMLButtonElement).dataset.id || '0');
+            removeTodo(todoId);
+        });
+    });
+};
+
+// Add Event Listeners to Todo Items
+const addTodoEventListeners = (): void => {
+    // Checkbox event listeners
+    document.querySelectorAll('.todo-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', (event) => {
+            const todoId = parseInt((event.target as HTMLInputElement).dataset.id || '0');
+            toggleTodo(todoId);
+        });
+    });
+
+    // Edit button event listeners
+    document.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', (event) => {
+            const todoId = parseInt((event.target as HTMLButtonElement).dataset.id || '0');
+            const todoText = (event.target as HTMLButtonElement).dataset.text || '';
+            startEditing(todoId, todoText);
+        });
+    });
+
+    // Remove button event listeners
+    document.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.addEventListener('click', (event) => {
+            const todoId = parseInt((event.target as HTMLButtonElement).dataset.id || '0');
+            removeTodo(todoId);
+        });
+    });
+};
+
+// Toggle Todo Completion
+const toggleTodo = (id: number): void => {
+    todos = todos.map(todo => 
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+    );
+    
+    updateStats();
+    renderTodos();
+    
+    console.log('Toggled todo:', id);
+    
+    // TODO: Add saveTodos() in local-storage feature
+};
 
 // Render Todos Function
 const renderTodos = (): void => {
