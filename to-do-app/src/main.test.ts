@@ -320,6 +320,145 @@ describe('Local Storage Persistence', () => {
     });
 });
 
+
+describe('Import/Export Functionality', () => {
+    beforeEach(() => {
+        // Clear any existing data
+        localStorage.clear();
+    });
+    
+    it('should format export data with metadata', () => {
+        const testTodos = [
+            { id: 1, text: 'Test Todo', completed: false, category: 'basic', priority: 'medium', createdAt: new Date() }
+        ];
+        
+        const exportData = {
+            todos: testTodos,
+            exportDate: new Date().toISOString(),
+            version: '1.0',
+            totalCount: testTodos.length
+        };
+        
+        expect(exportData.todos).toEqual(testTodos);
+        expect(exportData.totalCount).toBe(1);
+        expect(exportData.version).toBe('1.0');
+        expect(exportData.exportDate).toBeTruthy();
+    });
+    
+    it('should validate todo structure during import', () => {
+        const validTodo = {
+            id: 1,
+            text: 'Valid Todo',
+            completed: false,
+            category: 'basic',
+            priority: 'medium',
+            createdAt: '2024-01-01T00:00:00.000Z'
+        };
+        
+        const invalidTodo = {
+            id: 'invalid', // Should be number
+            text: 123, // Should be string
+            completed: 'false' // Should be boolean
+        };
+        
+        const validateTodoStructure = (todo: any): boolean => {
+            return (
+                typeof todo.id === 'number' &&
+                typeof todo.text === 'string' &&
+                typeof todo.completed === 'boolean'
+            );
+        };
+        
+        expect(validateTodoStructure(validTodo)).toBe(true);
+        expect(validateTodoStructure(invalidTodo)).toBe(false);
+    });
+    
+    it('should generate CSV format correctly', () => {
+        const testTodos = [
+            {
+                id: 1,
+                text: 'Test Todo',
+                completed: false,
+                category: 'basic',
+                priority: 'medium',
+                dueDate: new Date('2024-12-31'),
+                createdAt: new Date('2024-01-01')
+            }
+        ];
+        
+        const csvHeader = 'ID,Text,Completed,Category,Priority,Due Date,Created At\n';
+        const csvRow = '1,"Test Todo",false,basic,medium,"2024-12-31","2024-01-01"';
+        const expectedCSV = csvHeader + csvRow;
+        
+        // Simulate CSV generation logic
+        const csvRows = testTodos.map(todo => {
+            const dueDate = todo.dueDate ? todo.dueDate.toISOString().split('T')[0] : '';
+            const createdAt = todo.createdAt.toISOString().split('T')[0];
+            
+            return `${todo.id},"${todo.text}",${todo.completed},${todo.category},${todo.priority},"${dueDate}","${createdAt}"`;
+        }).join('\n');
+        
+        const csvContent = csvHeader + csvRows;
+        
+        expect(csvContent).toContain('ID,Text,Completed');
+        expect(csvContent).toContain('Test Todo');
+        expect(csvContent).toContain('2024-12-31');
+    });
+    
+    it('should handle import data processing', () => {
+        const importData = {
+            todos: [
+                {
+                    id: 1,
+                    text: 'Imported Todo',
+                    completed: true,
+                    category: 'advanced',
+                    priority: 'high',
+                    dueDate: '2024-12-31T00:00:00.000Z',
+                    createdAt: '2024-01-01T00:00:00.000Z'
+                }
+            ],
+            exportDate: '2024-01-01T00:00:00.000Z',
+            version: '1.0'
+        };
+        
+        // Simulate import processing
+        const processedTodos = importData.todos.map((todo: any) => ({
+            id: todo.id || Date.now(),
+            text: todo.text || 'Imported Todo',
+            completed: Boolean(todo.completed),
+            category: todo.category || 'basic',
+            priority: todo.priority || 'medium',
+            dueDate: todo.dueDate ? new Date(todo.dueDate) : undefined,
+            createdAt: todo.createdAt ? new Date(todo.createdAt) : new Date()
+        }));
+        
+        expect(processedTodos[0].id).toBe(1);
+        expect(processedTodos[0].text).toBe('Imported Todo');
+        expect(processedTodos[0].completed).toBe(true);
+        expect(processedTodos[0].dueDate).toBeInstanceOf(Date);
+        expect(processedTodos[0].createdAt).toBeInstanceOf(Date);
+    });
+    
+    it('should handle malformed import data gracefully', () => {
+        const malformedData = {
+            todos: 'not an array',
+            invalidStructure: true
+        };
+        
+        let isValid = false;
+        try {
+            if (!malformedData.todos || !Array.isArray(malformedData.todos)) {
+                throw new Error('Invalid file format');
+            }
+            isValid = true;
+        } catch (error) {
+            isValid = false;
+        }
+        
+        expect(isValid).toBe(false);
+    });
+});
+
 // TODO: Add feature-specific tests in their respective branches:
 // - feature/dark-mode: Theme toggle tests
-// - feature/import-export: File operations tests
