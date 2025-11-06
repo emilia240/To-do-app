@@ -309,34 +309,6 @@ const initializeActionButtons = (): void => {
 };
 
 
-// Add Event Listeners to Todo Items
-const addTodoEventListeners = (): void => {
-    // Checkbox event listeners
-    document.querySelectorAll('.todo-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('change', (event) => {
-            const todoId = parseInt((event.target as HTMLInputElement).dataset.id || '0');
-            toggleTodo(todoId);
-        });
-    });
-
-    // Edit button event listeners
-    document.querySelectorAll('.edit-btn').forEach(btn => {
-        btn.addEventListener('click', (event) => {
-            const todoId = parseInt((event.target as HTMLButtonElement).dataset.id || '0');
-            const todoText = (event.target as HTMLButtonElement).dataset.text || '';
-            startEditing(todoId, todoText);
-        });
-    });
-
-    // Remove button event listeners
-    document.querySelectorAll('.remove-btn').forEach(btn => {
-        btn.addEventListener('click', (event) => {
-            const todoId = parseInt((event.target as HTMLButtonElement).dataset.id || '0');
-            removeTodo(todoId);
-        });
-    });
-};
-
 // Toggle Todo Completion
 const toggleTodo = (id: number): void => {
     todos = todos.map(todo => 
@@ -352,6 +324,76 @@ const toggleTodo = (id: number): void => {
 };
 
 // Render Todos Function
+
+// Refactored: Break down renderTodos() into smaller, focused functions
+
+// Create individual todo item HTML
+const createTodoItemHTML = (todo: Todo): string => {
+    return `
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4 flex-1">
+                <input type="checkbox" ${todo.completed ? 'checked' : ''} 
+                       class="todo-checkbox w-5 h-5 rounded border-2 border-light-border dark:border-[#9985FB]"
+                       data-id="${todo.id}">
+                
+                <div class="flex-1">
+                    <div class="flex items-center space-x-3">
+                        <span class="anta-font text-lg ${todo.completed ? 'line-through opacity-60' : ''} text-light-text dark:text-dark-text">
+                            ${todo.text}
+                        </span>
+                        
+                        <div class="flex space-x-2">
+                            <span class="text-xs px-2 py-1 rounded border border-light-border dark:border-[#9985FB] text-light-text dark:text-dark-text">
+                                ${todo.category}
+                            </span>
+                            <span class="text-xs px-2 py-1 rounded border border-light-border dark:border-[#9985FB] text-light-text dark:text-dark-text">
+                                ${todo.priority}
+                            </span>
+                            ${todo.dueDate ? `
+                                <span class="text-xs px-2 py-1 rounded border border-light-border dark:border-[#9985FB] text-light-text dark:text-dark-text">
+                                    ${new Date(todo.dueDate).toLocaleDateString()}
+                                </span>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex space-x-2">
+                <button class="edit-btn p-2 rounded border border-light-border dark:border-[#9985FB] hover:bg-light-border dark:hover:bg-[#9985FB] transition-colors text-light-text dark:text-dark-text"
+                        data-id="${todo.id}" data-text="${todo.text}">
+                    Edit
+                </button>
+                <button class="remove-btn p-2 rounded border border-light-border dark:border-[#9985FB] hover:bg-light-border dark:hover:bg-[#9985FB] transition-colors text-light-text dark:text-dark-text"
+                        data-id="${todo.id}">
+                    Remove
+                </button>
+            </div>
+        </div>
+    `;
+};
+
+// Create empty state message
+const createEmptyStateMessage = (): HTMLLIElement => {
+    const emptyMessage = document.createElement('li');
+    emptyMessage.className = 'text-center py-8 text-light-text dark:text-dark-text';
+    emptyMessage.textContent = currentFilter === 'completed' 
+        ? 'No concepts mastered yet! Keep learning!' 
+        : 'No concepts to show. Add some TypeScript topics to learn!';
+    return emptyMessage;
+};
+
+// Create individual todo list item element
+const createTodoElement = (todo: Todo): HTMLLIElement => {
+    const li = document.createElement('li');
+    li.className = `todo-item p-4 rounded-lg border-2 border-light-border dark:border-[#9985FB] transition-all duration-200 ${
+        todo.completed ? 'opacity-60' : ''
+    }`;
+    li.innerHTML = createTodoItemHTML(todo);
+    return li;
+};
+
+// Refactored: Simplified renderTodos() function - now focused only on DOM manipulation
 const renderTodos = (): void => {
     if (!todoList) {
         console.error('Todo list element not found');
@@ -363,74 +405,56 @@ const renderTodos = (): void => {
     // Clear existing content
     todoList.innerHTML = '';
     
-    // Show empty state message
+    // Handle empty state
     if (filteredTodos.length === 0) {
-        const emptyMessage = document.createElement('li');
-        emptyMessage.className = 'text-center py-8 text-light-text dark:text-dark-text';
-        emptyMessage.textContent = currentFilter === 'completed' 
-            ? 'No concepts mastered yet! Keep learning!' 
-            : 'No concepts to show. Add some TypeScript topics to learn!';
-        todoList.appendChild(emptyMessage);
+        todoList.appendChild(createEmptyStateMessage());
         return;
     }
     
-    // Render each todo
+    // Render each todo using focused helper function
     filteredTodos.forEach(todo => {
-        const li = document.createElement('li');
-        li.className = `todo-item p-4 rounded-lg border-2 border-light-border dark:border-[#9985FB] transition-all duration-200 ${
-            todo.completed ? 'opacity-60' : ''
-        }`;
-        
-        li.innerHTML = `
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4 flex-1">
-                    <input type="checkbox" ${todo.completed ? 'checked' : ''} 
-                           class="todo-checkbox w-5 h-5 rounded border-2 border-light-border dark:border-[#9985FB]"
-                           data-id="${todo.id}">
-                    
-                    <div class="flex-1">
-                        <div class="flex items-center space-x-3">
-                            <span class="anta-font text-lg ${todo.completed ? 'line-through opacity-60' : ''} text-light-text dark:text-dark-text">
-                                ${todo.text}
-                            </span>
-                            
-                            <div class="flex space-x-2">
-                                <span class="text-xs px-2 py-1 rounded border border-light-border dark:border-[#9985FB] text-light-text dark:text-dark-text">
-                                    ${todo.category}
-                                </span>
-                                <span class="text-xs px-2 py-1 rounded border border-light-border dark:border-[#9985FB] text-light-text dark:text-dark-text">
-                                    ${todo.priority}
-                                </span>
-                                ${todo.dueDate ? `
-                                    <span class="text-xs px-2 py-1 rounded border border-light-border dark:border-[#9985FB] text-light-text dark:text-dark-text">
-                                        ${new Date(todo.dueDate).toLocaleDateString()}
-                                    </span>
-                                ` : ''}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="flex space-x-2">
-                    <button class="edit-btn p-2 rounded border border-light-border dark:border-[#9985FB] hover:bg-light-border dark:hover:bg-[#9985FB] transition-colors text-light-text dark:text-dark-text"
-                            data-id="${todo.id}" data-text="${todo.text}">
-                        Edit
-                    </button>
-                    <button class="remove-btn p-2 rounded border border-light-border dark:border-[#9985FB] hover:bg-light-border dark:hover:bg-[#9985FB] transition-colors text-light-text dark:text-dark-text"
-                            data-id="${todo.id}">
-                        Remove
-                    </button>
-                </div>
-            </div>
-        `;
-        
-        todoList.appendChild(li);
+        todoList.appendChild(createTodoElement(todo));
     });
-    
-    // Add event listeners to the newly created elements
-    addTodoEventListeners();
 };
 
+// Refactored: Use event delegation instead of multiple event listeners
+const initializeTodoListEventDelegation = (): void => {
+    if (!todoList) {
+        console.error('Todo list element not found for event delegation');
+        return;
+    }
+
+    // Single event listener on parent element using event delegation
+    todoList.addEventListener('click', (event) => {
+        const target = event.target as HTMLElement;
+        
+        // Handle edit button clicks
+        if (target.classList.contains('edit-btn')) {
+            const todoId = parseInt(target.dataset.id || '0');
+            const todoText = target.dataset.text || '';
+            startEditing(todoId, todoText);
+        }
+        
+        // Handle remove button clicks
+        if (target.classList.contains('remove-btn')) {
+            const todoId = parseInt(target.dataset.id || '0');
+            removeTodo(todoId);
+        }
+    });
+
+    // Separate event listener for checkbox changes (using delegation)
+    todoList.addEventListener('change', (event) => {
+        const target = event.target as HTMLInputElement;
+        
+        if (target.classList.contains('todo-checkbox')) {
+            const todoId = parseInt(target.dataset.id || '0');
+            toggleTodo(todoId);
+        }
+    });
+};
+
+// Remove the old addTodoEventListeners function - no longer needed
+// const addTodoEventListeners = (): void => { ... } // DELETED
 
 
 // Initialize Dark Mode Toggle - moved to dedicated function for consistency
@@ -458,6 +482,7 @@ const initApp = (): void => {
     initializeFilterButtons();
     initializeActionButtons();
     initializeDarkMode();
+    initializeTodoListEventDelegation();
     
     // Initialize statistics display (only called once)
     updateStats();
