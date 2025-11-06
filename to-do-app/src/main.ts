@@ -45,6 +45,13 @@ interface TodoStats {
     percentage: number;
 }
 
+// Interface for imported data structure
+interface ImportData {
+    todos: any[];
+    exportDate?: string;
+    version?: string;
+}
+
 // Pure function for calculating statistics - separated from DOM logic
 const calculateStats = (todoList: Todo[]): TodoStats => {
     const total = todoList.length;
@@ -525,20 +532,19 @@ const showStorageStatus = (message: string, isError: boolean = false): void => {
 // Export todos to JSON file
 const exportTodos = (): void => {
     try {
-        const dataToExport = {
+        const exportData: ImportData = {
             todos: todos,
             exportDate: new Date().toISOString(),
-            version: '1.0',
-            totalCount: todos.length
+            version: '1.0'
         };
-        
-        const dataStr = JSON.stringify(dataToExport, null, 2);
+
+        const dataStr = JSON.stringify(exportData, null, 2);
         const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(dataBlob);
         
         // Create download link
-        const downloadUrl = URL.createObjectURL(dataBlob);
         const link = document.createElement('a');
-        link.href = downloadUrl;
+        link.href = url;
         link.download = `typescript-todos-${new Date().toISOString().split('T')[0]}.json`;
         
         // Trigger download
@@ -547,7 +553,7 @@ const exportTodos = (): void => {
         document.body.removeChild(link);
         
         // Cleanup
-        URL.revokeObjectURL(downloadUrl);
+        URL.revokeObjectURL(url);
         
         showStorageStatus(`📤 Exported ${todos.length} todos!`);
         console.log('Todos exported successfully');
@@ -606,15 +612,21 @@ const importTodos = (): void => {
         reader.onload = (e) => {
             try {
                 const content = e.target?.result as string;
-                const importedData = JSON.parse(content);
-                
-                // Validate imported data structure
-                if (!importedData.todos || !Array.isArray(importedData.todos)) {
-                    throw new Error('Invalid file format');
+                const rawData = JSON.parse(content);
+
+
+                // Use type guard for robust validation
+                if (!validateImportData(rawData)) {
+                    throw new Error('Invalid file format: Expected todos array with valid structure');
                 }
                 
+                // Now we have type-safe access to ImportData
+                const importData: ImportData = rawData;
+                
+
+
                 // Process imported todos
-                const importedTodos: Todo[] = importedData.todos.map((todo: any) => ({
+                const importedTodos: Todo[] = importData.todos.map((todo: any) => ({
                     id: todo.id || Date.now() + Math.random(),
                     text: todo.text || 'Imported Todo',
                     completed: Boolean(todo.completed),
@@ -663,6 +675,24 @@ const importTodos = (): void => {
     input.click();
 };
 
+
+
+// Type guard function for validating import data structure
+const validateImportData = (data: any): data is ImportData => {
+    return (
+        data &&
+        typeof data === 'object' &&
+        Array.isArray(data.todos) &&
+        data.todos.every((todo: any) => 
+            todo &&
+            typeof todo === 'object' &&
+            typeof todo.text === 'string' &&
+            typeof todo.completed === 'boolean' &&
+            (todo.category === undefined || typeof todo.category === 'string') &&
+            (todo.priority === undefined || typeof todo.priority === 'string')
+        )
+    );
+};
 
 
 // Show export format selection modal
