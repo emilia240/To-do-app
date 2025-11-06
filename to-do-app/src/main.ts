@@ -615,7 +615,7 @@ const importTodos = (): void => {
                 
                 // Process imported todos
                 const importedTodos: Todo[] = importedData.todos.map((todo: any) => ({
-                    id: todo.id || Date.now() + Math.random(), // Ensure unique ID
+                    id: todo.id || Date.now() + Math.random(),
                     text: todo.text || 'Imported Todo',
                     completed: Boolean(todo.completed),
                     category: todo.category || 'basic',
@@ -624,22 +624,24 @@ const importTodos = (): void => {
                     createdAt: todo.createdAt ? new Date(todo.createdAt) : new Date()
                 }));
                 
+                // Store original count for logging
+                const originalCount = todos.length;
+                
                 // Ask user how to handle import
                 const choice = confirm(
                     `Import ${importedTodos.length} todos?\n\n` +
-                    `Click OK to REPLACE current todos (${todos.length} items)\n` +
+                    `Click OK to REPLACE current todos (${originalCount} items)\n` +
                     `Click Cancel to MERGE with current todos`
                 );
                 
                 if (choice) {
                     // Replace current todos
                     todos = importedTodos;
-                    showStorageStatus(`🔄 Replaced with ${importedTodos.length} todos!`);
+                    showStorageStatus(`🔄 Replaced ${originalCount} todos with ${importedTodos.length} todos!`);
                 } else {
                     // Merge with current todos
-                    const originalCount = todos.length;
                     todos = [...todos, ...importedTodos];
-                    showStorageStatus(`🔗 Added ${importedTodos.length} todos! Total: ${todos.length}`);
+                    showStorageStatus(`🔗 Added ${importedTodos.length} todos to existing ${originalCount}! Total: ${todos.length}`);
                 }
                 
                 // Update UI and save
@@ -647,7 +649,7 @@ const importTodos = (): void => {
                 updateStats();
                 renderTodos();
                 
-                console.log('Import successful:', importedData);
+                console.log(`Import successful: Original: ${originalCount}, Imported: ${importedTodos.length}, Total: ${todos.length}`);
                 
             } catch (error) {
                 console.error('Error importing todos:', error);
@@ -659,19 +661,6 @@ const importTodos = (): void => {
     };
     
     input.click();
-};
-
-// Validate imported todo structure
-const validateTodoStructure = (todo: any): boolean => {
-    return (
-        typeof todo.id === 'number' &&
-        typeof todo.text === 'string' &&
-        typeof todo.completed === 'boolean' &&
-        typeof todo.category === 'string' &&
-        typeof todo.priority === 'string' &&
-        (todo.dueDate === undefined || todo.dueDate === null || typeof todo.dueDate === 'string') &&
-        (typeof todo.createdAt === 'string')
-    );
 };
 
 

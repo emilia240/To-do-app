@@ -399,7 +399,7 @@ describe('Import/Export Functionality', () => {
         }).join('\n');
         
         const csvContent = csvHeader + csvRows;
-        
+        expect(csvContent).toBe(expectedCSV);
         expect(csvContent).toContain('ID,Text,Completed');
         expect(csvContent).toContain('Test Todo');
         expect(csvContent).toContain('2024-12-31');
