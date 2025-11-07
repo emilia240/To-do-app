@@ -4,7 +4,7 @@ import type {
   Priority,
   Category, 
   FilterType, 
- // EditState 
+  EditState 
 } from './types'
 
 // Constants
@@ -30,12 +30,16 @@ const progressPercentElement = document.getElementById('progress-percent') as HT
 // State Management with Type Annotations
 let todos: Todo[] = [];
 let currentFilter: FilterType = 'all';
-/* let editState: EditState = {
+let editState: EditState = {
     isEditing: false,
     editingId: null,
     originalText: ''
-}; */
+};
 
+
+
+
+// Interfaces and Type Definitions
 
 
 // Statistics calculation interface for type safety
@@ -45,12 +49,19 @@ interface TodoStats {
     percentage: number;
 }
 
-// Interface for imported data structure
+// Interface for imported data structure 
 interface ImportData {
     todos: any[];
     exportDate?: string;
     version?: string;
 }
+
+
+
+
+
+// Utility Functions 
+
 
 // Pure function for calculating statistics - separated from DOM logic
 const calculateStats = (todoList: Todo[]): TodoStats => {
@@ -62,13 +73,113 @@ const calculateStats = (todoList: Todo[]): TodoStats => {
 };
 
 
-
 // Get priority from radio buttons with type safety
 const getSelectedPriority = (): Priority => {
     const selected = document.querySelector('input[name="priority"]:checked') as HTMLInputElement;
     return selected?.value as Priority || 'medium';
 };
 
+
+// Type guard function for validating import data structure
+const validateImportData = (data: any): data is ImportData => {
+    return (
+        data &&
+        typeof data === 'object' &&
+        Array.isArray(data.todos) &&
+        data.todos.every((todo: any) => 
+            todo &&
+            typeof todo === 'object' &&
+            typeof todo.text === 'string' &&
+            typeof todo.completed === 'boolean' &&
+            (todo.category === undefined || typeof todo.category === 'string') &&
+            (todo.priority === undefined || typeof todo.priority === 'string')
+        )
+    );
+};
+
+
+
+
+
+// Local Storage Functions
+
+// Load todos from localStorage
+const loadTodos = (): Todo[] => {
+    try {
+        const stored = localStorage.getItem(storageKey);
+        if (stored) {
+            const parsed = JSON.parse(stored);
+            const loadedTodos = parsed.map((todo: any) => ({
+                ...todo,
+                dueDate: todo.dueDate ? new Date(todo.dueDate) : undefined,
+                createdAt: new Date(todo.createdAt)
+            }));
+            showStorageStatus(`📂 Loaded ${loadedTodos.length} todos`);
+            return loadedTodos;
+        }
+    } catch (error) {
+        console.error('Error loading todos from localStorage:', error);
+        showStorageStatus('❌ Load failed!', true);
+    }
+    return [];
+};
+
+
+// Save todos to localStorage
+const saveTodos = (message?: string): void => {
+    try {
+        localStorage.setItem(storageKey, JSON.stringify(todos));
+        console.log('Todos saved to localStorage');
+        if (message) {
+            showStorageStatus(message);
+        } else {
+            showStorageStatus('Todos saved successfully');
+        }
+    } catch (error) {
+        console.error('Error saving todos to localStorage:', error);
+        showStorageStatus('Error saving todos', true);
+    }
+};
+
+
+// Add storage status indicator
+const showStorageStatus = (message: string, isError: boolean = false): void => {
+    // Create or get existing status element
+    let statusElement = document.getElementById('storage-status');
+    if (!statusElement) {
+        statusElement = document.createElement('div');
+        statusElement.id = 'storage-status';
+        statusElement.className = 'fixed bottom-4 right-4 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 transform translate-y-full opacity-0';
+        document.body.appendChild(statusElement);
+    }
+    
+    // Update content and styling
+    statusElement.textContent = message;
+    statusElement.className = `fixed bottom-4 right-4 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
+        isError 
+            ? 'bg-red-700 text-white border-2 border-red-600' 
+            : 'bg-green-700 text-white border-2 border-green-600'
+    }`;
+    
+    // Show the status
+    setTimeout(() => {
+        statusElement!.style.transform = 'translateY(0)';
+        statusElement!.style.opacity = '1';
+    }, 100);
+    
+    // Hide after 2 seconds
+    setTimeout(() => {
+        statusElement!.style.transform = 'translateY(100%)';
+        statusElement!.style.opacity = '0';
+    }, 2000);
+};
+
+
+
+
+
+
+// Form handling and validation
 
 // Add Todo Function
 const addTodo = (text: string, category: Category, priority: Priority, dueDate?: Date): void => {
@@ -89,7 +200,6 @@ const addTodo = (text: string, category: Category, priority: Priority, dueDate?:
     console.log('New todo added:', newTodo);
     console.log('Total todos:', todos.length);
     
-    // Update statistics after adding todo
     updateStats();
     renderTodos();
     saveTodos();
@@ -113,6 +223,7 @@ const validateTodoInput = (text: string): boolean => {
     hideError();
     return true;
 };
+
 
 // Error message helper functions
 const showError = (message: string): void => {
@@ -168,7 +279,13 @@ const initializeForm = (): void => {
 };
 
 
+
+
+
+
+
 // Update Statistics Function
+
 const updateStats = (): void => {
     // Calculate statistics using pure function
     const stats = calculateStats(todos);
@@ -183,12 +300,72 @@ const updateStats = (): void => {
 
 
 
+
+
+
+
+//Filtering and Displaying logic for Todos
+
+
+
 // Filter Todos Function
 const filterTodos = (filter: FilterType): void => {
-   currentFilter = filter;
+    currentFilter = filter;
     
-    // Update active filter button styling
-    updateFilterButtonStyling(filter);
+    // Update active filter button styling with color-coded approach
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        const btnFilter = btn.getAttribute('data-filter');
+        const isActive = btnFilter === filter;
+        
+        // Remove all existing classes
+        btn.classList.remove(
+            'bg-[#9985FB]', 'text-dark-bg',
+            'bg-[#0055FF]', 'text-white',
+            'bg-[#0F7D00]', 'text-white',
+            'bg-[#EB5092]', 'text-white',
+            'border-[#9985FB]', 'border-[#0055FF]', 'border-[#0F7D00]', 'border-[#EB5092]',
+            'text-[#9985FB]', 'text-[#0055FF]', 'text-[#0F7D00]', 'text-[#EB5092]',
+            'text-[#020513]', 'hover:text-[#9985FB]', 'hover:text-[#0055FF]', 'hover:text-[#0F7D00]', 'hover:text-[#EB5092]',
+            'hover:bg-[#9985FB]', 'hover:bg-[#0055FF]', 'hover:bg-[#0F7D00]', 'hover:bg-[#EB5092]',
+            'border-light-border', 'bg-light-border', 'text-light-bg'
+        );
+        
+        // Apply colors based on filter type
+        switch (btnFilter) {
+            case 'all':
+                btn.classList.add('border-[#9985FB]', 'text-[#020513]');
+                if (isActive) {
+                    btn.classList.add('bg-[#9985FB]');
+                } else {
+                    btn.classList.add('hover:bg-[#9985FB]');
+                }
+                break;
+            case 'active':
+                btn.classList.add('border-[#0055FF]', 'text-[#020513]');
+                if (isActive) {
+                    btn.classList.add('bg-[#0055FF]');
+                } else {
+                    btn.classList.add('hover:bg-[#0055FF]');
+                }
+                break;
+            case 'completed':
+                btn.classList.add('border-[#0F7D00]', 'text-[#020513]');
+                if (isActive) {
+                    btn.classList.add('bg-[#0F7D00]');
+                } else {
+                    btn.classList.add('hover:bg-[#0F7D00]');
+                }
+                break;
+            case 'critical':
+                btn.classList.add('border-[#EB5092]', 'text-[#020513]');
+                if (isActive) {
+                    btn.classList.add('bg-[#EB5092]');
+                } else {
+                    btn.classList.add('hover:bg-[#EB5092]');
+                }
+                break;
+        }
+    });
     
     // Render todos with new filter
     renderTodos();
@@ -196,20 +373,6 @@ const filterTodos = (filter: FilterType): void => {
     console.log('Filter changed to:', filter);
 };
 
-
-// Filter Button Styling
-const updateFilterButtonStyling = (activeFilter: FilterType): void => {
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        const btnFilter = btn.getAttribute('data-filter') as FilterType;
-        
-        if (btnFilter === activeFilter) {
-            btn.classList.add('border-light-border', 'bg-light-border', 'text-light-bg');
-        } else {
-            btn.classList.remove('bg-light-border', 'text-light-bg');
-            btn.classList.add('border-light-border');
-        }
-    });
-};
 
 
 // Get Filtered Todos Function
@@ -226,6 +389,8 @@ const getFilteredTodos = (): Todo[] => {
     }
 };
 
+
+
 // Initialize Filter Event Listeners
 const initializeFilterButtons = (): void => {
     document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -237,8 +402,34 @@ const initializeFilterButtons = (): void => {
 };
 
 
+
+
+
+
+
+// Todo CRUD Operations
+
+
+// Toggle Todo Completion
+const toggleTodo = (id: number): void => {
+    if (editState.isEditing) return;
+    
+    todos = todos.map(todo => 
+        todo.id === id ? { ...todo, completed: !todo.completed } : todo
+    );
+
+    updateStats();
+    renderTodos();
+    saveTodos();
+    
+    console.log('Toggled todo:', id);
+};
+
+
 // Toggle All Todos Function
 const toggleAllTodos = (): void => {
+    if (editState.isEditing) return;
+
     const allCompleted = todos.every(todo => todo.completed);
     todos = todos.map(todo => ({
         ...todo,
@@ -256,83 +447,86 @@ const toggleAllTodos = (): void => {
 
 // Remove Todo Function
 const removeTodo = (id: number): void => {
-    if (confirm('Remove this concept from your learning list?')) {
-        todos = todos.filter(todo => todo.id !== id);
-        
-        updateStats();
-        renderTodos();
-        saveTodos();
-        
-        console.log('Removed todo:', id);
-        
-    }
+    todos = todos.filter(todo => todo.id !== id);
+    saveTodos('🗑️ Todo removed successfully');
+    renderTodos();
+    updateStats();
 };
 
-
-// Start Editing Todo (basic version)
-const startEditing = (id: number, currentText: string): void => {
-    const newText = prompt('Edit your TypeScript concept:', currentText);
-    
-    if (newText && newText.trim() !== '' && newText.trim() !== currentText) {
-        todos = todos.map(todo => 
-            todo.id === id ? { ...todo, text: newText.trim() } : todo
-        );
-        
-        updateStats();
-        renderTodos();
-        saveTodos();
-        
-        console.log('Edited todo:', id, 'New text:', newText);
-        
-        // TODO: Enhance with inline editing in future update
-    }
-};
 
 // Clear Completed Todos Function
 const clearCompletedTodos = (): void => {
-    if (confirm('Remove all mastered concepts?')) {
-        const completedCount = todos.filter(todo => todo.completed).length;
-        todos = todos.filter(todo => !todo.completed);
-        
-        updateStats();
-        renderTodos();
-        saveTodos();
-        
-        console.log(`Cleared ${completedCount} completed todos`);
-    }
-};
+    if (editState.isEditing) return;
 
-// Initialize Action Button Event Listeners
-const initializeActionButtons = (): void => {
-    const checkAllBtn = document.getElementById('check-all');
-    const clearCompletedBtn = document.getElementById('clear-completed');
     
-    if (checkAllBtn) {
-        checkAllBtn.addEventListener('click', toggleAllTodos);
-    }
-    
-    if (clearCompletedBtn) {
-        clearCompletedBtn.addEventListener('click', clearCompletedTodos);
-    }
-};
-
-
-// Toggle Todo Completion
-const toggleTodo = (id: number): void => {
-    todos = todos.map(todo => 
-        todo.id === id ? { ...todo, completed: !todo.completed } : todo
-    );
+    const completedCount = todos.filter(todo => todo.completed).length;
+    todos = todos.filter(todo => !todo.completed);
     
     updateStats();
     renderTodos();
     saveTodos();
     
-    console.log('Toggled todo:', id);
+    console.log(`Cleared ${completedCount} completed todos`);
+
 };
 
-// Render Todos Function
 
-// Refactored: Break down renderTodos() into smaller, focused functions
+
+
+
+
+// Editing Functionality
+
+
+// Start Editing Todo Function
+const startEditing = (id: number, currentText: string): void => {
+    editState = {
+        isEditing: true,
+        editingId: id,
+        originalText: currentText
+    };
+    renderTodos();
+};
+
+
+// Save Edited Todo
+const saveEdit = (id: number, newText: string, newCategory?: Category, newPriority?: Priority, newDueDate?: Date | null): void => {
+    if (newText.trim() === '') {
+        cancelEdit();
+        return;
+    }
+    
+    todos = todos.map(todo => 
+        todo.id === id ? { 
+            ...todo, 
+            text: newText.trim(),
+            category: newCategory || todo.category,
+            priority: newPriority || todo.priority,
+            dueDate: newDueDate !== undefined ? (newDueDate || undefined) : todo.dueDate
+        } : todo
+    );
+    saveTodos();
+    editState = { isEditing: false, editingId: null, originalText: '' };
+    renderTodos();
+    updateStats();
+};
+
+
+
+// Cancel Editing Todo
+const cancelEdit = (): void => {
+    editState = { isEditing: false, editingId: null, originalText: '' };
+    renderTodos();
+};
+
+
+
+
+
+
+// Rendering and DOM Manipulation
+
+
 
 // Create individual todo item HTML
 const createTodoItemHTML = (todo: Todo): string => {
@@ -340,25 +534,27 @@ const createTodoItemHTML = (todo: Todo): string => {
         <div class="flex items-center justify-between">
             <div class="flex items-center space-x-4 flex-1">
                 <input type="checkbox" ${todo.completed ? 'checked' : ''} 
-                       class="todo-checkbox w-5 h-5 rounded border-2 border-light-border dark:border-[#9985FB]"
-                       data-id="${todo.id}">
+                    class="todo-checkbox w-5 h-5 rounded border-2 border-light-border dark:border-dark-border bg-transparent"
+                    data-id="${todo.id}">
                 
                 <div class="flex-1">
                     <div class="flex items-center space-x-3">
-                        <span class="anta-font text-lg ${todo.completed ? 'line-through opacity-60' : ''} text-light-text dark:text-dark-text">
+                        <span class="anta-font text-lg ${todo.completed ? 'line-through' : ''}">
                             ${todo.text}
                         </span>
                         
                         <div class="flex space-x-2">
-                            <span class="text-xs px-2 py-1 rounded border border-light-border dark:border-[#9985FB] text-light-text dark:text-dark-text">
+                            <span class="text-xs px-2 py-1 rounded border border-light-border dark:border-dark-border">
                                 ${todo.category}
                             </span>
-                            <span class="text-xs px-2 py-1 rounded border border-light-border dark:border-[#9985FB] text-light-text dark:text-dark-text">
+                            <span class="text-xs px-2 py-1 rounded border border-light-border dark:border-dark-border ${
+                                todo.priority === 'critical' ? 'bg-[#EB5092] text-white border-[#EB5092]' : ''
+                            }">
                                 ${todo.priority}
                             </span>
                             ${todo.dueDate ? `
-                                <span class="text-xs px-2 py-1 rounded border border-light-border dark:border-[#9985FB] text-light-text dark:text-dark-text">
-                                    ${new Date(todo.dueDate).toLocaleDateString()}
+                                <span class="text-xs px-2 py-1 rounded border border-light-border dark:border-dark-border">
+                                    📅 ${new Date(todo.dueDate).toLocaleDateString()}
                                 </span>
                             ` : ''}
                         </div>
@@ -367,18 +563,76 @@ const createTodoItemHTML = (todo: Todo): string => {
             </div>
             
             <div class="flex space-x-2">
-                <button class="edit-btn p-2 rounded border border-light-border dark:border-[#9985FB] hover:bg-light-border dark:hover:bg-[#9985FB] transition-colors text-light-text dark:text-dark-text"
+                <button class="edit-btn p-2 rounded border border-light-border dark:border-dark-border hover:bg-light-border dark:hover:bg-dark-border transition-colors ${editState.isEditing ? 'opacity-50 cursor-not-allowed' : ''}"
                         data-id="${todo.id}" data-text="${todo.text}">
-                    Edit
+                    ✏️
                 </button>
-                <button class="remove-btn p-2 rounded border border-light-border dark:border-[#9985FB] hover:bg-light-border dark:hover:bg-[#9985FB] transition-colors text-light-text dark:text-dark-text"
+                <button class="remove-btn p-2 rounded border border-light-border dark:border-dark-border hover:bg-light-border dark:hover:bg-dark-border transition-colors ${editState.isEditing ? 'opacity-50 cursor-not-allowed' : ''}"
                         data-id="${todo.id}">
-                    Remove
+                    🗑️
                 </button>
             </div>
         </div>
     `;
 };
+
+
+
+// Create edit mode HTML
+const createEditModeHTML = (todo: Todo): string => {
+    return `
+        <div class="space-y-4">
+            <!-- Text Input -->
+            <input type="text" value="${todo.text}" 
+                   class="edit-text-input w-full p-2 bg-transparent border-2 border-light-border dark:border-dark-border rounded anta-font text-lg">
+            
+            <!-- Category, Priority, and Date Editors -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Category Select -->
+                <div>
+                    <label class="block text-sm font-medium mb-1">Category</label>
+                    <select class="edit-category-select w-full p-2 bg-transparent border-2 border-light-border dark:border-dark-border rounded">
+                        <option value="basic" ${todo.category === 'basic' ? 'selected' : ''}>Basic Types</option>
+                        <option value="advanced" ${todo.category === 'advanced' ? 'selected' : ''}>Advanced Types</option>
+                        <option value="oop" ${todo.category === 'oop' ? 'selected' : ''}>OOP Concepts</option>
+                        <option value="dom" ${todo.category === 'dom' ? 'selected' : ''}>DOM Manipulation</option>
+                        <option value="modules" ${todo.category === 'modules' ? 'selected' : ''}>Modules</option>
+                    </select>
+                </div>
+                
+                <!-- Priority Select -->
+                <div>
+                    <label class="block text-sm font-medium mb-1">Priority</label>
+                    <select class="edit-priority-select w-full p-2 bg-transparent border-2 border-light-border dark:border-dark-border rounded">
+                        <option value="low" ${todo.priority === 'low' ? 'selected' : ''}>Low</option>
+                        <option value="medium" ${todo.priority === 'medium' ? 'selected' : ''}>Medium</option>
+                        <option value="high" ${todo.priority === 'high' ? 'selected' : ''}>High</option>
+                        <option value="critical" ${todo.priority === 'critical' ? 'selected' : ''}>Critical</option>
+                    </select>
+                </div>
+                
+                <!-- Due Date Input -->
+                <div>
+                    <label class="block text-sm font-medium mb-1">Due Date</label>
+                    <input type="date" value="${todo.dueDate ? todo.dueDate.toISOString().split('T')[0] : ''}"
+                           class="edit-date-input w-full p-2 bg-transparent border-2 border-light-border dark:border-dark-border rounded">
+                </div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="flex justify-end space-x-2">
+                <button class="save-edit text-sm px-4 py-2 rounded border-2 border-green-700 text-green-700 hover:bg-green-700 hover:text-white transition-colors">
+                    💾 Save Changes
+                </button>
+                <button class="cancel-edit text-sm px-4 py-2 rounded border-2 border-gray-700 text-gray-700 hover:bg-gray-700 hover:text-white transition-colors">
+                    ❌ Cancel
+                </button>
+            </div>
+        </div>
+    `;
+};
+
+
 
 // Create empty state message
 const createEmptyStateMessage = (): HTMLLIElement => {
@@ -390,15 +644,54 @@ const createEmptyStateMessage = (): HTMLLIElement => {
     return emptyMessage;
 };
 
+
 // Create individual todo list item element
 const createTodoElement = (todo: Todo): HTMLLIElement => {
     const li = document.createElement('li');
     li.className = `todo-item p-4 rounded-lg border-2 border-light-border dark:border-[#9985FB] transition-all duration-200 ${
         todo.completed ? 'opacity-60' : ''
     }`;
-    li.innerHTML = createTodoItemHTML(todo);
+    
+    const isEditing = editState.isEditing && editState.editingId === todo.id;
+    
+    if (isEditing) {
+        li.innerHTML = createEditModeHTML(todo);
+        setupEditModeEventListeners(li, todo);
+    } else {
+        li.innerHTML = createTodoItemHTML(todo);
+    }
+    
     return li;
 };
+
+
+// Setup event listeners for edit mode
+const setupEditModeEventListeners = (li: HTMLLIElement, todo: Todo): void => {
+    const saveBtn = li.querySelector('.save-edit') as HTMLButtonElement;
+    const cancelBtn = li.querySelector('.cancel-edit') as HTMLButtonElement;
+    const textInput = li.querySelector('.edit-text-input') as HTMLInputElement;
+    const categorySelect = li.querySelector('.edit-category-select') as HTMLSelectElement;
+    const prioritySelect = li.querySelector('.edit-priority-select') as HTMLSelectElement;
+    const dateInput = li.querySelector('.edit-date-input') as HTMLInputElement;
+    
+    const handleSave = () => {
+        const newText = textInput.value;
+        const newCategory = categorySelect.value as Category;
+        const newPriority = prioritySelect.value as Priority;
+        const newDueDate = dateInput.value ? new Date(dateInput.value) : null;
+        
+        saveEdit(todo.id, newText, newCategory, newPriority, newDueDate);
+    };
+    
+    saveBtn.addEventListener('click', handleSave);
+    cancelBtn.addEventListener('click', cancelEdit);
+    textInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') handleSave();
+    });
+    textInput.focus();
+};
+
+
 
 // Refactored: Simplified renderTodos() function - now focused only on DOM manipulation
 const renderTodos = (): void => {
@@ -424,6 +717,15 @@ const renderTodos = (): void => {
     });
 };
 
+
+
+
+
+
+
+// Event Listeners Delegation
+
+
 // Refactored: Use event delegation instead of multiple event listeners
 const initializeTodoListEventDelegation = (): void => {
     if (!todoList) {
@@ -437,6 +739,7 @@ const initializeTodoListEventDelegation = (): void => {
         
         // Handle edit button clicks
         if (target.classList.contains('edit-btn')) {
+            if (editState.isEditing) return; // Prevent multiple edits
             const todoId = parseInt(target.dataset.id || '0');
             const todoText = target.dataset.text || '';
             startEditing(todoId, todoText);
@@ -444,6 +747,7 @@ const initializeTodoListEventDelegation = (): void => {
         
         // Handle remove button clicks
         if (target.classList.contains('remove-btn')) {
+            if (editState.isEditing) return; // Prevent removal while editing
             const todoId = parseInt(target.dataset.id || '0');
             removeTodo(todoId);
         }
@@ -462,71 +766,10 @@ const initializeTodoListEventDelegation = (): void => {
 
 
 
-// Load todos from localStorage
-const loadTodos = (): Todo[] => {
-    try {
-        const stored = localStorage.getItem(storageKey);
-        if (stored) {
-            const parsed = JSON.parse(stored);
-            const loadedTodos = parsed.map((todo: any) => ({
-                ...todo,
-                dueDate: todo.dueDate ? new Date(todo.dueDate) : undefined,
-                createdAt: new Date(todo.createdAt)
-            }));
-            showStorageStatus(`📂 Loaded ${loadedTodos.length} todos`);
-            return loadedTodos;
-        }
-    } catch (error) {
-        console.error('Error loading todos from localStorage:', error);
-        showStorageStatus('❌ Load failed!', true);
-    }
-    return [];
-};
 
-// Save todos to localStorage
-const saveTodos = (): void => {
-    try {
-        localStorage.setItem(storageKey, JSON.stringify(todos));
-        console.log('Todos saved to localStorage');
-        showStorageStatus('Todos saved successfully');
-    } catch (error) {
-        console.error('Error saving todos to localStorage:', error);
-        showStorageStatus('Error saving todos', true);
-    }
-};
 
-// Add storage status indicator
-const showStorageStatus = (message: string, isError: boolean = false): void => {
-    // Create or get existing status element
-    let statusElement = document.getElementById('storage-status');
-    if (!statusElement) {
-        statusElement = document.createElement('div');
-        statusElement.id = 'storage-status';
-        statusElement.className = 'fixed bottom-4 right-4 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 transform translate-y-full opacity-0';
-        document.body.appendChild(statusElement);
-    }
-    
-    // Update content and styling
-    statusElement.textContent = message;
-    statusElement.className = `fixed bottom-4 right-4 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 ${
-        isError 
-            ? 'bg-red-500 text-white border-2 border-red-600' 
-            : 'bg-green-500 text-white border-2 border-green-600'
-    }`;
-    
-    // Show the status
-    setTimeout(() => {
-        statusElement!.style.transform = 'translateY(0)';
-        statusElement!.style.opacity = '1';
-    }, 100);
-    
-    // Hide after 2 seconds
-    setTimeout(() => {
-        statusElement!.style.transform = 'translateY(100%)';
-        statusElement!.style.opacity = '0';
-    }, 2000);
-};
 
+// Import/Export Functionality
 
 
 // Export todos to JSON file
@@ -564,42 +807,12 @@ const exportTodos = (): void => {
     }
 };
 
-// Generate CSV export
-const exportTodosCSV = (): void => {
-    try {
-        const csvHeader = 'ID,Text,Completed,Category,Priority,Due Date,Created At\n';
-        const csvRows = todos.map(todo => {
-            const dueDate = todo.dueDate ? todo.dueDate.toISOString().split('T')[0] : '';
-            const createdAt = todo.createdAt.toISOString().split('T')[0];
-            
-            return `${todo.id},"${todo.text}",${todo.completed},${todo.category},${todo.priority},"${dueDate}","${createdAt}"`;
-        }).join('\n');
-        
-        const csvContent = csvHeader + csvRows;
-        const csvBlob = new Blob([csvContent], { type: 'text/csv' });
-        
-        const downloadUrl = URL.createObjectURL(csvBlob);
-        const link = document.createElement('a');
-        link.href = downloadUrl;
-        link.download = `typescript-todos-${new Date().toISOString().split('T')[0]}.csv`;
-        
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        
-        URL.revokeObjectURL(downloadUrl);
-        
-        showStorageStatus(`📊 Exported ${todos.length} todos as CSV!`);
-        
-    } catch (error) {
-        console.error('Error exporting CSV:', error);
-        showStorageStatus('❌ CSV export failed!', true);
-    }
-};
 
 
 // Import todos from JSON file
 const importTodos = (): void => {
+    if (editState.isEditing) return;
+
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.json';
@@ -677,79 +890,6 @@ const importTodos = (): void => {
 
 
 
-// Type guard function for validating import data structure
-const validateImportData = (data: any): data is ImportData => {
-    return (
-        data &&
-        typeof data === 'object' &&
-        Array.isArray(data.todos) &&
-        data.todos.every((todo: any) => 
-            todo &&
-            typeof todo === 'object' &&
-            typeof todo.text === 'string' &&
-            typeof todo.completed === 'boolean' &&
-            (todo.category === undefined || typeof todo.category === 'string') &&
-            (todo.priority === undefined || typeof todo.priority === 'string')
-        )
-    );
-};
-
-
-// Show export format selection modal
-const showExportDialog = (): void => {
-    // Create modal overlay
-    const modal = document.createElement('div');
-    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-    
-    modal.innerHTML = `
-        <div class="bg-light-card dark:bg-dark-card border-2 border-light-border dark:border-[#9985FB] rounded-lg p-6 max-w-md mx-4">
-            <h3 class="anta-font text-xl mb-4 text-light-text dark:text-dark-text">Export Format</h3>
-            <p class="text-light-text dark:text-dark-text mb-6">Choose your preferred export format:</p>
-            
-            <div class="space-y-3 mb-6">
-                <button id="export-json" class="w-full p-3 rounded-lg border-2 border-light-border dark:border-[#9985FB] hover:bg-light-border dark:hover:bg-[#9985FB] transition-colors text-left">
-                    <div class="font-bold">📄 JSON Format</div>
-                    <div class="text-sm opacity-75">Complete data with import capability</div>
-                </button>
-                
-                <button id="export-csv" class="w-full p-3 rounded-lg border-2 border-light-border dark:border-[#9985FB] hover:bg-light-border dark:hover:bg-[#9985FB] transition-colors text-left">
-                    <div class="font-bold">📊 CSV Format</div>
-                    <div class="text-sm opacity-75">Spreadsheet compatible format</div>
-                </button>
-            </div>
-            
-            <button id="cancel-export" class="w-full p-2 rounded-lg border border-gray-400 text-gray-600 hover:bg-gray-100 transition-colors">
-                Cancel
-            </button>
-        </div>
-    `;
-    
-    // Add event listeners
-    modal.querySelector('#export-json')?.addEventListener('click', () => {
-        exportTodos();
-        document.body.removeChild(modal);
-    });
-    
-    modal.querySelector('#export-csv')?.addEventListener('click', () => {
-        exportTodosCSV();
-        document.body.removeChild(modal);
-    });
-    
-    modal.querySelector('#cancel-export')?.addEventListener('click', () => {
-        document.body.removeChild(modal);
-    });
-    
-    // Close on overlay click
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
-            document.body.removeChild(modal);
-        }
-    });
-    
-    document.body.appendChild(modal);
-};
-
-
 // Initialize Import/Export Button Event Listeners
 const initializeImportExportButtons = (): void => {
     const exportBtn = document.getElementById('export-todos');
@@ -761,7 +901,7 @@ const initializeImportExportButtons = (): void => {
                 showStorageStatus('❌ No todos to export!', true);
                 return;
             }
-            showExportDialog();
+            exportTodos();
         });
     }
     
@@ -772,7 +912,29 @@ const initializeImportExportButtons = (): void => {
 
 
 
-// Initialize Dark Mode Toggle - moved to dedicated function for consistency
+
+
+//Action Buttons and Dark Mode Toggle
+
+
+
+// Initialize Action Button Event Listeners
+const initializeActionButtons = (): void => {
+    const checkAllBtn = document.getElementById('check-all');
+    const clearCompletedBtn = document.getElementById('clear-completed');
+    
+    if (checkAllBtn) {
+        checkAllBtn.addEventListener('click', toggleAllTodos);
+    }
+    
+    if (clearCompletedBtn) {
+        clearCompletedBtn.addEventListener('click', clearCompletedTodos);
+    }
+};
+
+
+
+// Initialize Dark Mode Toggle 
 const initializeDarkMode = (): void => {
     const darkModeToggle = document.getElementById('toggle-dark-mode');
     if (darkModeToggle) {
@@ -787,6 +949,12 @@ const initializeDarkMode = (): void => {
         });
     }
 };
+
+
+
+
+
+
 
 // Initialize Application
 const initApp = (): void => {
