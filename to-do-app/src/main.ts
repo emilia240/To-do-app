@@ -4,8 +4,14 @@ import type {
   Priority,
   Category, 
   FilterType, 
-  EditState 
-} from './types'
+  EditState,
+  TodoStats, 
+  ImportData
+} from './modules/types'
+
+import { initializeDarkMode } from './modules/darkModeToggle'
+
+import { createTodoItemHTML, createEditModeHTML } from './modules/todoTemplates';
 
 // Constants
 const storageKey = 'typescript-todos';
@@ -27,7 +33,7 @@ const progressPercentElement = document.getElementById('progress-percent') as HT
 
 
 
-// State Management with Type Annotations
+// State Management with Type Annotations for filters and edit state
 let todos: Todo[] = [];
 let currentFilter: FilterType = 'all';
 let editState: EditState = {
@@ -36,25 +42,7 @@ let editState: EditState = {
     originalText: ''
 };
 
-
-
-
-// Interfaces and Type Definitions
-
-
-// Statistics calculation interface for type safety
-interface TodoStats {
-    total: number;
-    completed: number;
-    percentage: number;
-}
-
-// Interface for imported data structure 
-interface ImportData {
-    todos: any[];
-    exportDate?: string;
-    version?: string;
-}
+export { editState }; //for the HTML templates module
 
 
 
@@ -405,8 +393,6 @@ const initializeFilterButtons = (): void => {
 
 
 
-
-
 // Todo CRUD Operations
 
 
@@ -474,7 +460,6 @@ const clearCompletedTodos = (): void => {
 
 
 
-
 // Editing Functionality
 
 
@@ -526,112 +511,7 @@ const cancelEdit = (): void => {
 
 // Rendering and DOM Manipulation
 
-
-
-// Create individual todo item HTML
-const createTodoItemHTML = (todo: Todo): string => {
-    return `
-        <div class="flex items-center justify-between">
-            <div class="flex items-center space-x-4 flex-1">
-                <input type="checkbox" ${todo.completed ? 'checked' : ''} 
-                    class="todo-checkbox w-5 h-5 rounded border-2 border-light-border dark:border-dark-border bg-transparent"
-                    data-id="${todo.id}">
-                
-                <div class="flex-1">
-                    <div class="flex items-center space-x-3">
-                        <span class="anta-font text-lg ${todo.completed ? 'line-through' : ''}">
-                            ${todo.text}
-                        </span>
-                        
-                        <div class="flex space-x-2">
-                            <span class="text-xs px-2 py-1 rounded border border-light-border dark:border-dark-border">
-                                ${todo.category}
-                            </span>
-                            <span class="text-xs px-2 py-1 rounded border border-light-border dark:border-dark-border ${
-                                todo.priority === 'critical' ? 'bg-[#EB5092] text-white border-[#EB5092]' : ''
-                            }">
-                                ${todo.priority}
-                            </span>
-                            ${todo.dueDate ? `
-                                <span class="text-xs px-2 py-1 rounded border border-light-border dark:border-dark-border">
-                                    📅 ${new Date(todo.dueDate).toLocaleDateString()}
-                                </span>
-                            ` : ''}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="flex space-x-2">
-                <button class="edit-btn p-2 rounded border border-light-border dark:border-dark-border hover:bg-light-border dark:hover:bg-dark-border transition-colors ${editState.isEditing ? 'opacity-50 cursor-not-allowed' : ''}"
-                        data-id="${todo.id}" data-text="${todo.text}">
-                    ✏️
-                </button>
-                <button class="remove-btn p-2 rounded border border-light-border dark:border-dark-border hover:bg-light-border dark:hover:bg-dark-border transition-colors ${editState.isEditing ? 'opacity-50 cursor-not-allowed' : ''}"
-                        data-id="${todo.id}">
-                    🗑️
-                </button>
-            </div>
-        </div>
-    `;
-};
-
-
-
-// Create edit mode HTML
-const createEditModeHTML = (todo: Todo): string => {
-    return `
-        <div class="space-y-4">
-            <!-- Text Input -->
-            <input type="text" value="${todo.text}" 
-                   class="edit-text-input w-full p-2 bg-transparent border-2 border-light-border dark:border-dark-border rounded anta-font text-lg">
-            
-            <!-- Category, Priority, and Date Editors -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <!-- Category Select -->
-                <div>
-                    <label class="block text-sm font-medium mb-1">Category</label>
-                    <select class="edit-category-select w-full p-2 bg-transparent border-2 border-light-border dark:border-dark-border rounded">
-                        <option value="basic" ${todo.category === 'basic' ? 'selected' : ''}>Basic Types</option>
-                        <option value="advanced" ${todo.category === 'advanced' ? 'selected' : ''}>Advanced Types</option>
-                        <option value="oop" ${todo.category === 'oop' ? 'selected' : ''}>OOP Concepts</option>
-                        <option value="dom" ${todo.category === 'dom' ? 'selected' : ''}>DOM Manipulation</option>
-                        <option value="modules" ${todo.category === 'modules' ? 'selected' : ''}>Modules</option>
-                    </select>
-                </div>
-                
-                <!-- Priority Select -->
-                <div>
-                    <label class="block text-sm font-medium mb-1">Priority</label>
-                    <select class="edit-priority-select w-full p-2 bg-transparent border-2 border-light-border dark:border-dark-border rounded">
-                        <option value="low" ${todo.priority === 'low' ? 'selected' : ''}>Low</option>
-                        <option value="medium" ${todo.priority === 'medium' ? 'selected' : ''}>Medium</option>
-                        <option value="high" ${todo.priority === 'high' ? 'selected' : ''}>High</option>
-                        <option value="critical" ${todo.priority === 'critical' ? 'selected' : ''}>Critical</option>
-                    </select>
-                </div>
-                
-                <!-- Due Date Input -->
-                <div>
-                    <label class="block text-sm font-medium mb-1">Due Date</label>
-                    <input type="date" value="${todo.dueDate ? todo.dueDate.toISOString().split('T')[0] : ''}"
-                           class="edit-date-input w-full p-2 bg-transparent border-2 border-light-border dark:border-dark-border rounded">
-                </div>
-            </div>
-            
-            <!-- Action Buttons -->
-            <div class="flex justify-end space-x-2">
-                <button class="save-edit text-sm px-4 py-2 rounded border-2 border-green-700 text-green-700 hover:bg-green-700 hover:text-white transition-colors">
-                    💾 Save Changes
-                </button>
-                <button class="cancel-edit text-sm px-4 py-2 rounded border-2 border-gray-700 text-gray-700 hover:bg-gray-700 hover:text-white transition-colors">
-                    ❌ Cancel
-                </button>
-            </div>
-        </div>
-    `;
-};
-
+//using templates functions imported from todoTemplates module
 
 
 // Create empty state message
@@ -914,7 +794,7 @@ const initializeImportExportButtons = (): void => {
 
 
 
-//Action Buttons and Dark Mode Toggle
+//Action Buttons
 
 
 
@@ -929,24 +809,6 @@ const initializeActionButtons = (): void => {
     
     if (clearCompletedBtn) {
         clearCompletedBtn.addEventListener('click', clearCompletedTodos);
-    }
-};
-
-
-
-// Initialize Dark Mode Toggle 
-const initializeDarkMode = (): void => {
-    const darkModeToggle = document.getElementById('toggle-dark-mode');
-    if (darkModeToggle) {
-        darkModeToggle.addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-            const lightIcon = document.querySelector('.light-icon');
-            const darkIcon = document.querySelector('.dark-icon');
-            if (lightIcon && darkIcon) {
-                lightIcon.classList.toggle('hidden');
-                darkIcon.classList.toggle('hidden');
-            }
-        });
     }
 };
 
